@@ -12,6 +12,8 @@ import {
   IonButton
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service'; // IMPORTANTE
+
 
 @Component({
   selector: 'app-login',
@@ -34,13 +36,34 @@ import { Router } from '@angular/router';
 export class LoginPage {
   email = '';
   password = '';
-  constructor(private router: Router) {}
+  loading = false;
+  errorMsg = '';
+  admin = false;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
   login() {
-    // Simulación login (¡pon tu lógica real aquí!)
-    if (this.email && this.password) {
-      this.router.navigate(['/users']);
-    } else {
-      alert("Introduce email y contraseña");
-    }
+    this.loading = true;
+    this.errorMsg = '';
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response: any) => {
+        this.loading = false;
+        if (response.token) {
+          this.authService.saveToken(response.token);
+          this.admin = this.authService.isAdmin(); // Usa el método del servicio
+          this.router.navigate(['/users']);
+        } else {
+          this.errorMsg = "Respuesta inesperada del servidor.";
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMsg =
+          error.error?.message || 'Credenciales incorrectas o error de red.';
+      }
+    });
   }
 }

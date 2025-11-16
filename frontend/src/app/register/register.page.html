@@ -1,19 +1,32 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Registro</ion-title>
-  </ion-toolbar>
-</ion-header>
-<ion-content class="ion-padding">
-  <form (ngSubmit)="register()">
+<ion-content>
+  <form (ngSubmit)="register()" #registerForm="ngForm">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Registro</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
     <ion-item>
       <ion-label position="floating">Email</ion-label>
-      <ion-input [(ngModel)]="email" name="email" type="email"></ion-input>
+      <ion-input type="email" name="email" required [(ngModel)]="email" #emailInput="ngModel"></ion-input>
     </ion-item>
+    <div *ngIf="emailInput.invalid && emailInput.touched" style="color:red; margin-left: 16px;">
+      El email es obligatorio.
+    </div>
+
     <ion-item>
-      <ion-label position="floating">Password</ion-label>
-      <ion-input [(ngModel)]="password" name="password" type="password"></ion-input>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input type="password" name="password" required minlength="6" [(ngModel)]="password" #passwordInput="ngModel"></ion-input>
     </ion-item>
-    <ion-button expand="block" type="submit">Registrarme</ion-button>
+    <div *ngIf="passwordInput.invalid && passwordInput.touched" style="color:red; margin-left: 16px;">
+      La contraseña debe tener al menos 6 caracteres.
+    </div>
+
+    <ion-button expand="block" type="submit" [disabled]="registerForm.invalid || loading">
+      Registrar
+    </ion-button>
+    <div *ngIf="loading" style="text-align:center; margin-top:8px;">Cargando...</div>
+
+    <div *ngIf="errorMsg" style="color:red; margin:16px 0;">{{errorMsg}}</div>
   </form>
-  <ion-button expand="block" routerLink="/login">Volver al login</ion-button>
 </ion-content>

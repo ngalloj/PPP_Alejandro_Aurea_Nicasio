@@ -12,6 +12,7 @@ import {
   IonButton
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { UserService } from '../services/user.service';  // Ajusta la ruta según tu estructura
 
 @Component({
   selector: 'app-register',
@@ -34,9 +35,26 @@ import { Router } from '@angular/router';
 export class RegisterPage {
   email = '';
   password = '';
-  constructor(private router: Router) {}
+  loading = false;
+  errorMsg = '';
+
+  constructor(
+    private userService: UserService,
+    private router: Router
+  ) {}
+
   register() {
-    alert("Usuario registrado (simulado)");
-    this.router.navigate(['/login']);
+    this.loading = true;
+    this.errorMsg = '';
+    this.userService.create({ email: this.email, password: this.password }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMsg = err.error?.message || "Error al registrar el usuario";
+      }
+    });
   }
 }
