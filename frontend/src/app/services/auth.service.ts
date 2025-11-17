@@ -13,12 +13,25 @@ export class AuthService {
 
   saveToken(token: string) { localStorage.setItem('token', token); }
   getToken() { return localStorage.getItem('token'); }
-  isLoggedIn() { return !!this.getToken(); }
+  isLoggedIn() { 
+    const token = this.getToken();
+    return !!token && token.split('.').length === 3; // es probable JWT
+  }
 
   isAdmin(): boolean {
     const t = this.getToken();
-    if(!t) return false;
-    const payload = JSON.parse(atob(t.split('.')[1]));
-    return payload.rol === 'admin';
+    if (!t || t.trim() === '' || t.split('.').length !== 3) return false;
+    try {
+      const payload = JSON.parse(atob(t.split('.')[1]));
+      return payload.rol === 'admin';
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return false;
+    }
   }
+
+  logout() {
+    localStorage.removeItem('token');
+  }
+
 }

@@ -1,25 +1,46 @@
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
-
-// Importa tu guard y los componentes de las páginas
+import { HttpClientModule } from '@angular/common/http';
 import { AdminGuard } from './guards/admin.guard';
-//import { PanelAdminComponent } from './pages/panel-admin/panel-admin.component';
-//import { HomeComponent } from './pages/home/home.component';
-//import { ForbiddenComponent } from './pages/forbidden/forbidden.component'; // Pon un componente para acceso denegado
+import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { UsersComponent } from './pages/users/users.component';
+import { ForbiddenComponent } from './pages/forbidden/forbidden.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { SidenavComponent } from './shared/sidenav/sidenav.component';
+import { AuthGuard } from './guards/auth.guard';
+import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
+
 
 const routes: Routes = [
- // { path: 'panel-admin', component: PanelAdminComponent, canActivate: [AdminGuard] }, // solo admin accede
- // { path: 'home', component: HomeComponent },
- // { path: 'forbidden', component: ForbiddenComponent }, // para mostrar acceso denegado
- // { path: '**', redirectTo: 'home' }
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule) },
-  { path: 'register', loadChildren: () => import('./register/register.module').then(m => m.RegisterPageModule) },
-  { path: 'users', loadChildren: () => import('./users/users.module').then(m => m.UsersPageModule) }
+  { path: 'login', component: LoginComponent },           // pública
+  { path: 'register', component: RegisterComponent },     // pública o protegida si sólo logueados
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] }, // solo autenticados
+  { path: 'admin', component: AdminDashboardComponent, canActivate: [AdminGuard] }, // solo admins
+  { path: 'forbidden', component: ForbiddenComponent },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes), BrowserModule,
+    RouterModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatListModule,
+    MatButtonModule,
+    SidenavComponent, 
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

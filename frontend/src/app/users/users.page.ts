@@ -32,6 +32,8 @@ export class UsersPage implements OnInit {
     { nombre: "Pepe Perez", email: "pepe@correo.com" },
     { nombre: "Ana Ruiz", email: "ana@correo.com" }
   ];
+  authService: any; //puesto porque me daba un error
+  router: any;  //puesto porque me daba un error
 
   // constructor(private userService: UserService) { }
 
@@ -39,4 +41,10 @@ export class UsersPage implements OnInit {
     // Si tienes un servicio, carga los usuarios aquí:
     // this.userService.getUsers().subscribe(users => { this.users = users });
   }
+
+  goLogout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
 }
