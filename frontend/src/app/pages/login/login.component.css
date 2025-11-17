@@ -1,0 +1,21 @@
+.error-msg {
+    color: #c00;
+    font-size: 0.95em;
+  }
+  .spinner {
+    margin-left: 1em;
+  }
+  form {
+    display: flex;
+    justify-content: center;
+    margin-top: 2em;
+  }
+  mat-card {
+    min-width: 320px;
+    max-width: 420px;
+    width: 100%;
+  }
+  mat-card-title, mat-card-content > div {
+    margin-bottom: 14px;
+  }
+  

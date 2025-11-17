@@ -1,14 +1,27 @@
 <h2>Iniciar sesión</h2>
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  <label>Email</label>
-  <input formControlName="email" type="email" [class.invalid]="loginForm.get('email').invalid && loginForm.get('email').touched">
-  <div *ngIf="loginForm.get('email').invalid && loginForm.get('email').touched" class="error-msg">Introduce un email válido.</div>
-
-  <label>Contraseña</label>
-  <input formControlName="password" type="password" [class.invalid]="loginForm.get('password').invalid && loginForm.get('password').touched">
-  <div *ngIf="loginForm.get('password').invalid && loginForm.get('password').touched" class="error-msg">Contraseña obligatoria.</div>
-
-  <button type="submit" [disabled]="loading">Entrar</button>
-  <div *ngIf="loading" class="spinner">Cargando...</div>
-  <div *ngIf="error" class="error-msg">{{ error }}</div>
+  <mat-card>
+    <mat-card-title>Login</mat-card-title>
+    <mat-card-content>
+      <div>
+        <label>Email</label>
+        <input matInput formControlName="email" placeholder="correo@ejemplo.com" type="email">
+        <div *ngIf="emailField?.invalid && emailField?.touched" class="error-msg">
+          Introduce un email válido.
+        </div>
+      </div>
+      <div>
+        <label>Contraseña</label>
+        <input matInput formControlName="password" placeholder="Contraseña" type="password">
+        <div *ngIf="passwordField?.invalid && passwordField?.touched" class="error-msg">
+          Campo obligatorio.
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading">Entrar</button>
+      <span *ngIf="loading" class="spinner">Cargando...</span>
+      <span *ngIf="error" class="error-msg">{{ error }}</span>
+    </mat-card-actions>
+  </mat-card>
 </form>

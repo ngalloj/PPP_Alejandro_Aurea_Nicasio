@@ -1,18 +1,33 @@
-<h2>Registro de usuario</h2>
-<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-  <label>Email</label>
-  <input formControlName="email" type="email">
-  <div *ngIf="registerForm.get('email').invalid && registerForm.get('email').touched" class="error-msg">Introduce un email válido.</div>
-
-  <label>Contraseña</label>
-  <input formControlName="password" type="password">
-  <div *ngIf="registerForm.get('password').invalid && registerForm.get('password').touched" class="error-msg">Campo obligatorio.</div>
-
-  <label>Repite Contraseña</label>
-  <input formControlName="password2" type="password">
-  <div *ngIf="registerForm.value.password !== registerForm.value.password2 && registerForm.get('password2').touched" class="error-msg">Las contraseñas no coinciden.</div>
-
-  <button type="submit" [disabled]="loading">Registrarse</button>
-  <div *ngIf="loading">Cargando...</div>
-  <div *ngIf="error" class="error-msg">{{ error }}</div>
-</form>
+<mat-card>
+  <mat-card-title>Registro de usuario</mat-card-title>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <mat-card-content>
+      <div>
+        <label>Email</label>
+        <input matInput formControlName="email" type="email">
+        <div *ngIf="emailField?.invalid && emailField?.touched" class="error-msg">
+          Introduce un email válido.
+        </div>
+      </div>
+      <div>
+        <label>Contraseña</label>
+        <input matInput formControlName="password" type="password">
+        <div *ngIf="passwordField?.invalid && passwordField?.touched" class="error-msg">
+          Campo obligatorio.
+        </div>
+      </div>
+      <div>
+        <label>Repite Contraseña</label>
+        <input matInput formControlName="password2" type="password">
+        <div *ngIf="(registerForm.hasError('notMatching')) && password2Field?.touched" class="error-msg">
+          Las contraseñas no coinciden.
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading">Registrarse</button>
+      <span *ngIf="loading">Cargando...</span>
+      <span *ngIf="error" class="error-msg">{{ error }}</span>
+    </mat-card-actions>
+  </form>
+</mat-card>

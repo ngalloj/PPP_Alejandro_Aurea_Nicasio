@@ -15,24 +15,16 @@ import { AuthService } from '../../services/auth.service';
     MatToolbarModule,
     MatIconModule,
     MatListModule,
-    CommonModule,     // para *ngFor y otras directivas comunes
-    RouterModule      // para [routerLink] y router-outlet
+    CommonModule,
+    RouterModule
   ],
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.css']
 })
 export class SidenavComponent {
-  constructor (public auth: AuthService) {}
+  constructor(public auth: AuthService) {}
 
   get isAdmin(): boolean {
     return this.auth.isAdmin();
   }
-
-  menu = [
-    { path: '/users', label: 'Usuarios', icon: 'group' },
-    { path: '/register', label: 'Registro', icon: 'person_add' },
-    // Agrega más opciones de menú si necesitas
-  ];
-
-  
 }

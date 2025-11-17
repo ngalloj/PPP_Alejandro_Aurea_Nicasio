@@ -1,22 +1,31 @@
 <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav #drawer class="sidenav" fixedInViewport>
-      <mat-toolbar>Clinica Veterinaria GMascotas</mat-toolbar>
-      <mat-nav-list>
-        <a mat-list-item *ngFor="let item of menu" [routerLink]="item.path" (click)="drawer.close()">
-          <mat-icon>{{item.icon}}</mat-icon>
-          <span>{{item.label}}</span>
+  <mat-sidenav #drawer class="sidenav" fixedInViewport>
+    <mat-toolbar>Clinica Vet</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/home" (click)="drawer.close()">
+        <mat-icon>home</mat-icon>
+        <span>Inicio</span>
+      </a>
+      <!-- solo admin -->
+      <ng-container *ngIf="isAdmin">
+        <a mat-list-item routerLink="/users" (click)="drawer.close()">
+          <mat-icon>group</mat-icon>
+          <span>Usuarios</span>
         </a>
-      </mat-nav-list>
-    </mat-sidenav>
-  
-    <mat-sidenav-content>
-      <mat-toolbar color="primary">
-        <button mat-icon-button (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
-        <span>Gestión Clínica</span>
-      </mat-toolbar>
-      <div class="main-content">
-        <router-outlet></router-outlet>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-  
+        <a mat-list-item routerLink="/admin" (click)="drawer.close()">
+          <mat-icon>dashboard</mat-icon>
+          <span>Panel Admin</span>
+        </a>
+      </ng-container>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
+      <span>Gestión Clínica</span>
+    </mat-toolbar>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
