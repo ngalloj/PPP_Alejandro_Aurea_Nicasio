@@ -14,9 +14,19 @@ export class AuthService {
 
   saveToken(token: string) { localStorage.setItem('token', token); }
   getToken() { return localStorage.getItem('token'); }
-  isLoggedIn() { 
+  
+  isLoggedIn(): boolean {
     const token = this.getToken();
-    return !!token && token.split('.').length === 3; // es probable JWT
+    // Debe ser un JWT válido (tres partes separadas por '.')
+    if (!token || token.split('.').length !== 3) return false;
+    // Aquí puedes añadir más validaciones como fecha de expiración si el payload la tiene
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Si quieres, comprueba también payload.exp que esté vigente
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   isAdmin(): boolean {
