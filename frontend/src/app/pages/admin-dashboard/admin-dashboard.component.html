@@ -1,13 +1,21 @@
 <h1>Panel del Administrador</h1>
-<div class="cards-container">
-  <div class="admin-card">
-    <h2>Gestión de Usuarios</h2>
-    <a routerLink="/users">Ver Usuarios</a>
-  </div>
-  <div class="admin-card">
-    <h2>Estadísticas</h2>
-    <!-- Aquí podrías poner pronto gráficas, KPIs, etc -->
-    <p>Pacientes registrados, citas, agenda, etc.</p>
-  </div>
-  <!-- Más tarjetas o enlaces según tus necesidades -->
+<div class="dashboard-container">
+  <mat-card class="admin-card">
+    <mat-card-title>Gestión de Usuarios</mat-card-title>
+    <mat-card-content>
+      <p>Administra cuentas de usuarios y sus roles.</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/users">Ver Usuarios</button>
+    </mat-card-actions>
+  </mat-card>
+  <mat-card class="admin-card">
+    <mat-card-title>Estadísticas</mat-card-title>
+    <mat-card-content>
+      <p>Visualiza el total de pacientes y citas de la clínica.</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button disabled>Proximamente</button>
+    </mat-card-actions>
+  </mat-card>
 </div>

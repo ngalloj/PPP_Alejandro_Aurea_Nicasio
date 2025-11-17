@@ -21,8 +21,8 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 const routes: Routes = [
   { path: 'login', component: LoginComponent },           // pública
   { path: 'register', component: RegisterComponent },     // pública o protegida si sólo logueados
-  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] }, // solo autenticados
-  { path: 'admin', component: AdminDashboardComponent, canActivate: [AdminGuard] }, // solo admins
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard, AdminGuard] }, // solo autenticados
+  { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard, AdminGuard] }, // solo admins
   { path: 'forbidden', component: ForbiddenComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }

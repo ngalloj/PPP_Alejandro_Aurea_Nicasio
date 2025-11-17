@@ -19,4 +19,11 @@
   .admin-card h2 {
     margin-top: 0;
   }
+  .dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: flex-start;
+    padding: 32px;
+  }
   
