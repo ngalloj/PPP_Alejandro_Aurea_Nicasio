@@ -1,20 +1,15 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API y lógica del backend para la clínica veterinaria.",
   "main": "index.js",
-  "directories": {
-    "test": "jest"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "jest",
+    "test:api": "jest --runInBand tests/api"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
@@ -29,5 +24,14 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "supertest": "^7.1.4"
-  }
+  },
+  "keywords": [
+    "node",
+    "express",
+    "backend",
+    "api",
+    "clinica-veterinaria"
+  ],
+  "author": "",
+  "license": "ISC"
 }
