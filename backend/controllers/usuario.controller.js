@@ -1,8 +1,9 @@
 const { Usuario } = require('../models'); // Ajusta la ruta si es necesario
-const jwt = require('jsonwebtoken'); // AGREGADO
-const SECRET = "CLAVE_SUPERSECRETA"; // usa una clave secreta fija (en prod, ponlo en variable de entorno)
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const SECRET = "CLAVE_SUPERSECRETA"; // Usa variable de entorno en producción
 
-// LOGIN (devuelve sólo datos serializables y oculta password)
+// LOGIN profesional (bcrypt + JWT)
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -12,31 +13,37 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Credenciales inválidas (usuario)' });
     }
 
-    if (usuario.password !== password) {
+    // LOGS
+    console.log('Probando login para:', email);
+
+    // SOLO UNA vez, aquí:
+    const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+
+    console.log('¿Password coincide para', email, '? =>', passwordCorrecta);
+
+    if (!passwordCorrecta) {
       return res.status(401).json({ error: 'Credenciales inválidas (password)' });
     }
 
     const { id, email: userEmail, rol } = usuario.get();
 
-    // CREA UN TOKEN JWT REAL CON LOS DATOS QUE EL FRONT NECESITA LEER
+    // Crea el token JWT
     const token = jwt.sign(
-      { id, email: userEmail, rol }, // payload
+      { id, email: userEmail, rol },
       SECRET,
-      { expiresIn: "4h" } // caduca en 4 horas
+      { expiresIn: "4h" }
     );
 
     return res.json({
       mensaje: 'Login correcto',
       usuario: { id, email: userEmail, rol },
-      token // este será un JWT válido y tu frontend podrá usar atob sin errores
+      token
     });
 
   } catch (err) {
     res.status(500).json({ error: "Error del servidor: " + err.message });
   }
 };
-
-
 
 // Obtener todos los usuarios
 exports.getAll = async (req, res) => {
@@ -68,10 +75,14 @@ exports.getById = async (req, res) => {
   }
 };
 
-// Crear usuario
+// Crear usuario (asegúrate de hashear contraseña antes de guardar)
 exports.create = async (req, res) => {
   try {
-    const usuario = await Usuario.create(req.body);
+    let { password, ...resto } = req.body;
+    if (password) {
+      password = await bcrypt.hash(password, 10);
+    }
+    const usuario = await Usuario.create({ ...resto, password });
     const { id, email, rol } = usuario.get();
     res.status(201).json({ id, email, rol });
   } catch (err) {
@@ -79,10 +90,14 @@ exports.create = async (req, res) => {
   }
 };
 
-// Actualizar usuario
+// Actualizar usuario (si actualizas password, hashea)
 exports.update = async (req, res) => {
   try {
-    const [actualizado] = await Usuario.update(req.body, { where: { id: req.params.id } });
+    let datos = { ...req.body };
+    if (datos.password) {
+      datos.password = await bcrypt.hash(datos.password, 10);
+    }
+    const [actualizado] = await Usuario.update(datos, { where: { id: req.params.id } });
     res.json({ actualizado });
   } catch (err) {
     res.status(400).json({ error: err.message });
