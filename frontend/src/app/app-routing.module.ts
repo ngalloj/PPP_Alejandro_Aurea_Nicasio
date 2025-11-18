@@ -16,12 +16,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { SidenavComponent } from './shared/sidenav/sidenav.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
-
+import { RoleGuard } from './guards/role.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },           // pública
   { path: 'register', component: RegisterComponent },     // pública o protegida si sólo logueados
-  { path: 'users', component: UsersComponent, canActivate: [AuthGuard, AdminGuard] }, // solo autenticados
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['admin', 'veterinario'] }}, // solo autenticados
   { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard, AdminGuard] }, // solo admins
   { path: 'forbidden', component: ForbiddenComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,10 +21,26 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.css']
 })
-export class SidenavComponent {
-  constructor(public auth: AuthService) {}
+export class SidenavComponent implements OnInit {
+  usuarioLogueado: any = null;
 
+  constructor(private auth: AuthService) {}
+
+  ngOnInit() {
+    this.usuarioLogueado = this.auth.getUserFromToken();
+  }
+
+  /** Atajos para roles */
   get isAdmin(): boolean {
-    return this.auth.isAdmin();
+    return this.usuarioLogueado?.rol === 'admin';
+  }
+  get isVeterinario(): boolean {
+    return this.usuarioLogueado?.rol === 'veterinario';
+  }
+  get isRecepcionista(): boolean {
+    return this.usuarioLogueado?.rol === 'recepcionista';
+  }
+  get isCliente(): boolean {
+    return this.usuarioLogueado?.rol === 'cliente';
   }
 }

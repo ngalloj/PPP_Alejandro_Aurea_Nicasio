@@ -7,6 +7,7 @@ import { RoleGuard } from './guards/role.guard';
 import { AnimalComponent } from './pages/animal/animal.component';
 import { MisAnimalesComponent } from './pages/mis-animales/mis-animales.component';
 import { ClientesCitasComponent } from './pages/clientes-citas/clientes-citas.component';
+import { AuthGuard } from './guards/auth.guard';
 // Lo mismo con cualquier otro componente usado
 
 
@@ -16,7 +17,8 @@ export const routes: Routes = [
 
   // Ejemplo de rutas protegidas por roles específicos:
   { path: 'admin', component: AdminDashboardComponent, canActivate: [RoleGuard], data: { roles: ['admin'] }},
-  { path: 'users', component: UsersComponent, canActivate: [RoleGuard], data: { roles: ['admin'] }},
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['admin', 'veterinario'] }},
+
 
   // Veterinario
   { path: 'animal', component: AnimalComponent, canActivate: [RoleGuard], data: { roles: ['veterinario','admin'] }},

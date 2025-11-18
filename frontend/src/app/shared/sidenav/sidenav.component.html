@@ -2,21 +2,39 @@
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
     <mat-toolbar>Clinica Vet</mat-toolbar>
     <mat-nav-list>
+      <!-- Opción visible para TODOS -->
       <a mat-list-item routerLink="/home" (click)="drawer.close()">
         <mat-icon>home</mat-icon>
         <span>Inicio</span>
       </a>
-      <!-- solo admin -->
-      <ng-container *ngIf="isAdmin">
-        <a mat-list-item routerLink="/users" (click)="drawer.close()">
-          <mat-icon>group</mat-icon>
-          <span>Usuarios</span>
-        </a>
-        <a mat-list-item routerLink="/admin" (click)="drawer.close()">
-          <mat-icon>dashboard</mat-icon>
-          <span>Panel Admin</span>
-        </a>
-      </ng-container>
+      <!-- Admin y Veterinario -->
+      <a
+        *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario')"
+        mat-list-item routerLink="/users" (click)="drawer.close()">
+        <mat-icon>group</mat-icon>
+        <span>Usuarios</span>
+      </a>
+      <!-- Solo Admin -->
+      <a
+        *ngIf="usuarioLogueado && usuarioLogueado.rol === 'admin'"
+        mat-list-item routerLink="/admin" (click)="drawer.close()">
+        <mat-icon>dashboard</mat-icon>
+        <span>Panel Admin</span>
+      </a>
+      <!-- Ejemplo adicional: Recepcionista -->
+      <a
+        *ngIf="usuarioLogueado && usuarioLogueado.rol === 'recepcionista'"
+        mat-list-item routerLink="/citas" (click)="drawer.close()">
+        <mat-icon>event</mat-icon>
+        <span>Citas</span>
+      </a>
+      <!-- Cliente (solo ve sus datos, modificable a tu gusto) -->
+      <a
+        *ngIf="usuarioLogueado && usuarioLogueado.rol === 'cliente'"
+        mat-list-item routerLink="/perfil" (click)="drawer.close()">
+        <mat-icon>person</mat-icon>
+        <span>Mi Perfil</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

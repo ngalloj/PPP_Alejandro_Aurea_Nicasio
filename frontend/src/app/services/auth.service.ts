@@ -64,4 +64,15 @@ export class AuthService {
     }
   }
 
+  // auth.service.ts
+getUserFromToken() {
+  const t = this.getToken();
+  if (!t) return null;
+  try {
+    return JSON.parse(atob(t.split('.')[1]));
+  } catch {
+    return null;
+  }
+}
+
 }
