@@ -22,7 +22,11 @@ export class AuthService {
     // Aquí puedes añadir más validaciones como fecha de expiración si el payload la tiene
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      // Si quieres, comprueba también payload.exp que esté vigente
+      if (payload.exp) {
+        // Si tu JWT tiene fecha de expiración
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp < now) return false;
+      }
       return true;
     } catch {
       return false;
