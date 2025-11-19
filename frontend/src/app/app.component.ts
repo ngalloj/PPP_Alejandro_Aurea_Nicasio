@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { SidenavComponent } from './shared/sidenav/sidenav.component';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AuthService } from './services/auth.service'; // Asegúrate de la ruta correcta
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ import { AuthService } from './services/auth.service'; // Asegúrate de la ruta 
 export class AppComponent implements OnInit {
   usuarioLogueado: any = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.usuarioLogueado = this.authService.getUserFromToken();
@@ -26,4 +27,7 @@ export class AppComponent implements OnInit {
       // Aquí puedes decidir mostrar menú/ruta según el rol
     }
   }
+
+
+  
 }

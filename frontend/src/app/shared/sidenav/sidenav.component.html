@@ -1,7 +1,7 @@
 <!-- frontend/src/app/shared/sidenav/sidenav.component.html -->
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
-    <mat-toolbar>Clinica Vet</mat-toolbar>
+    <mat-toolbar>DGMascotas</mat-toolbar>
     <mat-nav-list>
       <!-- Opción visible para TODOS -->
       <a mat-list-item routerLink="/home" (click)="drawer.close()">
@@ -29,13 +29,21 @@
         <mat-icon>event</mat-icon>
         <span>Citas</span>
       </a>
-      <!-- Cliente (solo ve sus datos, modificable a tu gusto) -->
+      <!-- Cliente (solo ve sus datos) -->
       <a
         *ngIf="usuarioLogueado && usuarioLogueado.rol === 'cliente'"
         mat-list-item routerLink="/perfil" (click)="drawer.close()">
         <mat-icon>person</mat-icon>
         <span>Mi Perfil</span>
       </a>
+      <!-- Botón Logout -->
+      <button *ngIf="auth.isLoggedIn()"
+        mat-list-item
+        (click)="logout(); drawer.close()"
+        style="width:100%;text-align:left;margin-top:16px;">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

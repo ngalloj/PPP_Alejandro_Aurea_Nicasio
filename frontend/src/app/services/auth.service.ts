@@ -46,10 +46,6 @@ export class AuthService {
     }
   }
 
-  logout() {
-    localStorage.removeItem('token');
-  }
-
   register(email: string, password: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/register`, { email, password });
   }
@@ -74,6 +70,12 @@ getUserFromToken() {
   } catch {
     return null;
   }
+}
+
+logout() {
+  localStorage.removeItem('token'); // O sessionStorage si es tu caso
+  // Si almacenas user
+  localStorage.removeItem('user');
 }
 
 }

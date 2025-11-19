@@ -2,7 +2,7 @@
 const { Usuario } = require('../models'); // Ajusta la ruta si es necesario
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const SECRET = "CLAVE_SUPERSECRETA"; // Usa variable de entorno en producción
+const SECRET = "admin1234"; // Usa variable de entorno en producción
 
 // LOGIN profesional (bcrypt + JWT) o texto plano temporal
 exports.login = async (req, res) => {
