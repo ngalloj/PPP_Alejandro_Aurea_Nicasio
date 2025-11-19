@@ -24,6 +24,11 @@ export class AnimalService {
     return this.http.get(`${this.apiUrl}/mios`, { headers: this.getHeaders() });
   }
 
+  crearAnimal(datos: any) {
+    return this.http.post(this.apiUrl, datos, { headers: this.getHeaders() });
+  }
+  
+
   modificarAnimal(animalId: string, datos: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${animalId}`, datos, { headers: this.getHeaders() });
   }

@@ -19,6 +19,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { RoleGuard } from './guards/role.guard';
 
+
 const routes: Routes = [
   { path: 'login', component: LoginComponent },           // pública
   { path: 'register', component: RegisterComponent },     // pública o protegida si sólo logueados
@@ -42,6 +43,7 @@ const routes: Routes = [
     MatButtonModule,
     SidenavComponent, 
   ],
-  exports: [RouterModule]
+  
 })
 export class AppRoutingModule { }
+export class AppModule {}

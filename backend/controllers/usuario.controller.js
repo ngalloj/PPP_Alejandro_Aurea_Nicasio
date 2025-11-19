@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const SECRET = "CLAVE_SUPERSECRETA"; // Usa variable de entorno en producción
 
-// LOGIN profesional (bcrypt + JWT)
+// LOGIN profesional (bcrypt + JWT) o texto plano temporal
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -17,8 +17,14 @@ exports.login = async (req, res) => {
     // LOGS
     console.log('Probando login para:', email);
 
-    // SOLO UNA vez, aquí:
+    // ======================
+    // SOLO TEXTO PLANO (para pruebas)
+    // const passwordCorrecta = (password === usuario.password);
+
+    // USAR SOLO UNO: (quita el comentario al que quieras usar)
+    // const passwordCorrecta = (password === usuario.password);
     const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+    // ======================
 
     console.log('¿Password coincide para', email, '? =>', passwordCorrecta);
 
@@ -50,7 +56,7 @@ exports.login = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll();
-    // Oculta password de la respuesta
+    // Solo envía id, email y rol
     const result = usuarios.map(u => {
       const { id, email, rol } = u.get();
       return { id, email, rol };
