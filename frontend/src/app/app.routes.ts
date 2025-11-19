@@ -30,7 +30,7 @@ export const routes: Routes = [
     path: 'crear-usuario', 
     component: UserCreateComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['admin', 'veterinario'] }
+    data: { roles: ['admin', 'veterinario', 'recepcionista'] }
   },
 
   // Rutas por defecto o error

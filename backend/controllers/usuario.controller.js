@@ -53,13 +53,31 @@ exports.getById = async (req, res) => {
 // Crear
 exports.create = async (req, res) => {
   try {
-    let { password, ...resto } = req.body;
-    if (password) password = await bcrypt.hash(password, 10);
-    const usuario = await Usuario.create({ ...resto, password });
-    const { id, email, rol } = usuario.get();
+    // QUIÉN está creando
+    const rolSolicitante = req.usuario.rol; // el rol del usuario autenticado
+    let { password, rol, ...resto } = req.body;
+
+    // Recepcionista SOLO puede crear clientes
+    if (rolSolicitante === 'recepcionista' && rol !== 'cliente') {
+      return res.status(403).json({ error: 'Recepcionista sólo puede crear clientes.' });
+    }
+
+    // Evitar que un cliente se autologue y cree usuarios
+    if (rolSolicitante === 'cliente') {
+      return res.status(403).json({ error: 'Cliente no autorizado para crear usuarios.' });
+    }
+
+    if (!rol) rol = 'cliente'; // Previene rol vacío (o puedes controlar en frontend/validación extra)
+
+    if (password) password = await require('bcrypt').hash(password, 10);
+    const usuario = await require('../models').Usuario.create({ ...resto, password, rol });
+    const { id, email } = usuario.get();
     res.status(201).json({ id, email, rol });
-  } catch (err) { res.status(400).json({ error: err.message }); }
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
+
 // Actualizar
 exports.update = async (req, res) => {
   try {

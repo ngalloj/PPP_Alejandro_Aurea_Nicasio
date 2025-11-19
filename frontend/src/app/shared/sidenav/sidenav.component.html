@@ -41,7 +41,7 @@
       </a>
 
       <!-- Crear usuario: solo admin y veterinario -->
-      <a *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario')"
+      <a *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario' || usuarioLogueado.rol === 'recepcionista')"
         mat-list-item routerLink="/crear-usuario" (click)="drawer.close()">
         <mat-icon>person_add</mat-icon>
         <span>Crear usuario</span>

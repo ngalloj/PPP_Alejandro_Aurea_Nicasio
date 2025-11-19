@@ -26,15 +26,29 @@ export class UserCreateComponent {
     public auth: AuthService
   ) {}
 
+  ngOnInit() {
+    // Si el logueado es recepcionista, sólo permitir "cliente"
+    const miRol = this.auth.getRole();
+    if (miRol === 'recepcionista') {
+      this.rolesPosibles = ['cliente'];
+      this.rol = 'cliente'; // Valor por defecto para facilitar
+    }
+  }  
+
   crearUsuario() {
+    // Si recepcionista, fuerza rol a cliente por seguridad extra
+    let rolToSend = this.rol;
+    if (this.auth.getRole() === 'recepcionista') rolToSend = 'cliente';
+
     this.http.post('http://localhost:3000/api/usuario', {
       email: this.email,
       password: this.password,
-      rol: this.rol
+      rol: rolToSend
     }).subscribe({
       next: res => {
         this.mensaje = 'Usuario creado con éxito';
         this.email = this.password = this.rol = '';
+        if (this.auth.getRole() === 'recepcionista') this.rol = 'cliente';
       },
       error: err => {
         this.mensaje = 'Error: ' + (err.error?.error || err.message);
@@ -44,6 +58,6 @@ export class UserCreateComponent {
 
   puedeCrear(): boolean {
     const role = this.auth.getRole();
-    return role === 'admin' || role === 'veterinario';
+    return role === 'admin' || role === 'veterinario' || role === 'recepcionista';
   }
 }

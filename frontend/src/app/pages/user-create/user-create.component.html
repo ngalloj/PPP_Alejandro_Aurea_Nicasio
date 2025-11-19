@@ -7,8 +7,7 @@
     <label for="password">Contraseña:</label>
     <input type="password" id="password" required name="password" [(ngModel)]="password" autocomplete="new-password"/><br>
     <label for="rol">Rol:</label>
-    <select id="rol" required name="rol" [(ngModel)]="rol">
-      <option value="" disabled selected>Elige un rol</option>
+    <select id="rol" required name="rol" [(ngModel)]="rol" [disabled]="auth.getRole() === 'recepcionista'">
       <option *ngFor="let r of rolesPosibles" [value]="r">{{ r }}</option>
     </select><br>
     <button type="submit" [disabled]="f.invalid">Crear</button>
@@ -19,6 +18,6 @@
 </div>
 <div *ngIf="!puedeCrear()">
   <p style="color:red; font-weight: bold;">
-    Solo administradores o veterinarios pueden crear usuarios.
+    No tienes permisos para crear usuarios.
   </p>
 </div>
