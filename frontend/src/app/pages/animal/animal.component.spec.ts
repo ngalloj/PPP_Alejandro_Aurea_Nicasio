@@ -1,3 +1,4 @@
+// frontend/src/app/pages/animal/animal.component.spec.ts
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AnimalComponent } from './animal.component';

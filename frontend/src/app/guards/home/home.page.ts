@@ -1,3 +1,4 @@
+// frontend/src/app/guards/home/home.page.ts
 import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 

@@ -1,0 +1,1 @@
+// frontend/src/auth.js

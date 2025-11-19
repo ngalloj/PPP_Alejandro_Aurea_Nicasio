@@ -1,3 +1,4 @@
+// frontend/.eslintrc.json
 {
   "root": true,
   "ignorePatterns": ["projects/**/*"],

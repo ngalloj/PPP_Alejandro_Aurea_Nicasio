@@ -1,3 +1,4 @@
+// frontend/src/app/pages/register/register.component.ts
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';

@@ -1,3 +1,4 @@
+// backend/middlewares/auth.js
 const jwt = require('jsonwebtoken');
 const SECRET = 'admin1234';
 

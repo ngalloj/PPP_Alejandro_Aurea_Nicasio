@@ -1,3 +1,4 @@
+// frontend/src/app/shared/sidenav/sidenav.component.ts
 import { Component, OnInit } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';

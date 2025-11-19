@@ -1,3 +1,4 @@
+// backend/routes/cita.routes.js
 const express = require('express');
 const ctrl = require('../controllers/cita.controller');
 const router = express.Router();

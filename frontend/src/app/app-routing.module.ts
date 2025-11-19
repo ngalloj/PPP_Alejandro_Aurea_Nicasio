@@ -1,3 +1,4 @@
+// frontend/src/app/app-routing.module.ts
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';

@@ -1,3 +1,4 @@
+// frontend/src/app/pages/login/login.component.spec.ts
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 

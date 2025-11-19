@@ -1,3 +1,4 @@
+// frontend/src/app/pages/admin-dashboard/admin-dashboard.component.ts
 import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';

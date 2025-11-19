@@ -1,3 +1,4 @@
+// backend/controllers/usuario.controllers.js
 const { Usuario } = require('../models'); // Ajusta la ruta si es necesario
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');

@@ -1,3 +1,4 @@
+// backend/controllers/cita.controller.js
 const { Cita, Animal, Usuario } = require('../models');
 
 exports.getAll = async (req, res) => {

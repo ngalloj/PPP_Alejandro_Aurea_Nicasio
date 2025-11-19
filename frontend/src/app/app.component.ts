@@ -1,3 +1,4 @@
+// frontend/src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
 import { SidenavComponent } from './shared/sidenav/sidenav.component';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';

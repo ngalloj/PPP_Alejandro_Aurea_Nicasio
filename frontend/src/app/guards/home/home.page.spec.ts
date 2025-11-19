@@ -1,3 +1,4 @@
+// frontend/src/app/guards/home/home.page.spec.ts
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomePage } from './home.page';

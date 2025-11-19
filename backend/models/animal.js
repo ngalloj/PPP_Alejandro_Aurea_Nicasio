@@ -1,3 +1,4 @@
+// backend/models/animal.js
 'use strict';
 const {
   Model

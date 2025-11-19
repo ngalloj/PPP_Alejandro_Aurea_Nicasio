@@ -1,3 +1,4 @@
+// backend/controllers/animal.controller.js
 const { Animal, Cita } = require('../models');
 
 // Listar todos los animales
