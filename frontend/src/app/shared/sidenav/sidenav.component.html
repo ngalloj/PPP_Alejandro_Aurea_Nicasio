@@ -2,44 +2,53 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
     <mat-toolbar>DGMascotas</mat-toolbar>
+    <div style="font-size:10px;color:gray">
+      Usuario: {{ usuarioLogueado | json }}
+    </div>
     <mat-nav-list>
-      <!-- Opción visible para TODOS -->
+      <!-- Inicio - para todos los usuarios -->
       <a mat-list-item routerLink="/home" (click)="drawer.close()">
         <mat-icon>home</mat-icon>
         <span>Inicio</span>
       </a>
-      <!-- Admin y Veterinario -->
-      <a
-        *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario')"
+
+      <!-- Usuarios - solo admin y veterinario -->
+      <a *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario')"
         mat-list-item routerLink="/users" (click)="drawer.close()">
         <mat-icon>group</mat-icon>
         <span>Usuarios</span>
       </a>
-      <!-- Solo Admin -->
-      <a
-        *ngIf="usuarioLogueado && usuarioLogueado.rol === 'admin'"
-        mat-list-item routerLink="/admin" (click)="drawer.close()">
+
+      <!-- Panel Admin -->
+      <a *ngIf="usuarioLogueado && usuarioLogueado.rol === 'admin'" mat-list-item routerLink="/admin"
+        (click)="drawer.close()">
         <mat-icon>dashboard</mat-icon>
         <span>Panel Admin</span>
       </a>
-      <!-- Ejemplo adicional: Recepcionista -->
-      <a
-        *ngIf="usuarioLogueado && usuarioLogueado.rol === 'recepcionista'"
-        mat-list-item routerLink="/citas" (click)="drawer.close()">
+
+      <!-- Citas - recepcionista -->
+      <a *ngIf="usuarioLogueado && usuarioLogueado.rol === 'recepcionista'" mat-list-item routerLink="/citas"
+        (click)="drawer.close()">
         <mat-icon>event</mat-icon>
         <span>Citas</span>
       </a>
-      <!-- Cliente (solo ve sus datos) -->
-      <a
-        *ngIf="usuarioLogueado && usuarioLogueado.rol === 'cliente'"
-        mat-list-item routerLink="/perfil" (click)="drawer.close()">
+
+      <!-- Perfil cliente -->
+      <a *ngIf="usuarioLogueado && usuarioLogueado.rol === 'cliente'" mat-list-item routerLink="/perfil"
+        (click)="drawer.close()">
         <mat-icon>person</mat-icon>
         <span>Mi Perfil</span>
       </a>
-      <!-- Botón Logout -->
-      <button *ngIf="auth.isLoggedIn()"
-        mat-list-item
-        (click)="logout(); drawer.close()"
+
+      <!-- Crear usuario: solo admin y veterinario -->
+      <a *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario')"
+        mat-list-item routerLink="/crear-usuario" (click)="drawer.close()">
+        <mat-icon>person_add</mat-icon>
+        <span>Crear usuario</span>
+      </a>
+
+      <!-- Cerrar sesión -->
+      <button *ngIf="auth.isLoggedIn()" mat-list-item (click)="logout(); drawer.close()"
         style="width:100%;text-align:left;margin-top:16px;">
         <mat-icon>exit_to_app</mat-icon>
         <span>Cerrar sesión</span>

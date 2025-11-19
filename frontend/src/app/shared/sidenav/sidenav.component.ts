@@ -5,7 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -25,15 +25,30 @@ import { AuthService } from '../../services/auth.service';
 export class SidenavComponent implements OnInit {
   usuarioLogueado: any = null;
 
-  constructor(public auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router) { }
 
 
   ngOnInit() {
     this.updateUsuario();
+
+    // Escucha cambios de navegación y actualiza usuarioLogueado
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.updateUsuario();
+      }
+    });
+
   }
 
   updateUsuario() {
     this.usuarioLogueado = this.auth.getUserFromToken();
+  }
+
+  // Método logout
+  logout() {
+    this.auth.logout();
+    this.usuarioLogueado = null;
+    this.router.navigate(['/login']);
   }
 
   /** Atajos para roles */
@@ -50,10 +65,5 @@ export class SidenavComponent implements OnInit {
     return this.usuarioLogueado?.rol === 'cliente';
   }
 
-  // Método logout
-  logout() {
-    this.auth.logout();
-    this.usuarioLogueado = null;
-    this.router.navigate(['/login']);
-  }
+  
 }

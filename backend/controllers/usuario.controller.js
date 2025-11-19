@@ -1,122 +1,79 @@
 // backend/controllers/usuario.controllers.js
-const { Usuario } = require('../models'); // Ajusta la ruta si es necesario
+const { Usuario } = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const SECRET = "admin1234"; // Usa variable de entorno en producción
+const SECRET = 'admin1234';
 
-// LOGIN profesional (bcrypt + JWT) o texto plano temporal
+// Login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const usuario = await Usuario.findOne({ where: { email } });
-
-    if (!usuario) {
+    if (!usuario)
       return res.status(401).json({ error: 'Credenciales inválidas (usuario)' });
-    }
 
-    // LOGS
-    console.log('Probando login para:', email);
-
-    // ======================
-    // SOLO TEXTO PLANO (para pruebas)
-    // const passwordCorrecta = (password === usuario.password);
-
-    // USAR SOLO UNO: (quita el comentario al que quieras usar)
-    // const passwordCorrecta = (password === usuario.password);
+    // Auditar passwords
     const passwordCorrecta = await bcrypt.compare(password, usuario.password);
-    // ======================
-
-    console.log('¿Password coincide para', email, '? =>', passwordCorrecta);
-
-    if (!passwordCorrecta) {
+    console.log(`¿Password coincide para ${email}? => ${passwordCorrecta}`);
+    if (!passwordCorrecta)
       return res.status(401).json({ error: 'Credenciales inválidas (password)' });
-    }
 
     const { id, email: userEmail, rol } = usuario.get();
-
-    // Crea el token JWT
-    const token = jwt.sign(
-      { id, email: userEmail, rol },
-      SECRET,
-      { expiresIn: "4h" }
-    );
-
+    const token = jwt.sign({ id, email: userEmail, rol }, SECRET, { expiresIn: '4h' });
     return res.json({
       mensaje: 'Login correcto',
       usuario: { id, email: userEmail, rol },
       token
     });
-
   } catch (err) {
-    res.status(500).json({ error: "Error del servidor: " + err.message });
+    res.status(500).json({ error: 'Error del servidor: ' + err.message });
   }
 };
 
-// Obtener todos los usuarios
+// Listar todos
 exports.getAll = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll();
-    // Solo envía id, email y rol
-    const result = usuarios.map(u => {
+    res.json(usuarios.map(u => {
       const { id, email, rol } = u.get();
       return { id, email, rol };
-    });
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    }));
+  } catch (err) { res.status(500).json({ error: err.message }); }
 };
-
-// Obtener usuario por ID
+// Obtener por ID
 exports.getById = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
-    if (usuario) {
-      const { id, email, rol } = usuario.get();
-      res.json({ id, email, rol });
-    } else {
-      res.status(404).json({ error: 'No encontrado' });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    if (!usuario)
+      return res.status(404).json({ error: 'No encontrado' });
+    const { id, email, rol } = usuario.get();
+    res.json({ id, email, rol });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 };
-
-// Crear usuario (asegúrate de hashear contraseña antes de guardar)
+// Crear
 exports.create = async (req, res) => {
   try {
     let { password, ...resto } = req.body;
-    if (password) {
-      password = await bcrypt.hash(password, 10);
-    }
+    if (password) password = await bcrypt.hash(password, 10);
     const usuario = await Usuario.create({ ...resto, password });
     const { id, email, rol } = usuario.get();
     res.status(201).json({ id, email, rol });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+  } catch (err) { res.status(400).json({ error: err.message }); }
 };
-
-// Actualizar usuario (si actualizas password, hashea)
+// Actualizar
 exports.update = async (req, res) => {
   try {
     let datos = { ...req.body };
-    if (datos.password) {
+    if (datos.password)
       datos.password = await bcrypt.hash(datos.password, 10);
-    }
     const [actualizado] = await Usuario.update(datos, { where: { id: req.params.id } });
     res.json({ actualizado });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+  } catch (err) { res.status(400).json({ error: err.message }); }
 };
-
-// Borrar usuario
+// Eliminar
 exports.delete = async (req, res) => {
   try {
     await Usuario.destroy({ where: { id: req.params.id } });
     res.json({ eliminado: true });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+  } catch (err) { res.status(400).json({ error: err.message }); }
 };
