@@ -1,3 +1,4 @@
+// backend/app.js
 const express = require('express');
 const cors = require('cors');
 const { sequelize } = require('./models'); // ruta correcta según tu proyecto
@@ -14,7 +15,7 @@ app.use('/api/animales', animalRoutes);
 app.use('/api/cita', citaRoutes);
 app.use('/api/usuario', usuarioRoutes);
 
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log("Tablas sincronizadas correctamente");
     app.listen(3000, () => { // <-- AGREGA ESTO

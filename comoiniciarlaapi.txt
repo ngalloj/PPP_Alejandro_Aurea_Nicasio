@@ -1,0 +1,48 @@
+Arranca Docker Desktop
+Asegúrate de que Docker Desktop esté iniciado (abierto y funcionando).
+
+Desde la raíz de tu proyecto, ejecuta en terminal:
+docker-compose up -d
+
+Arranca tu backend y frontend
+Si usas el comando monorepo:
+npm start
+También puedes arrancar por separado:
+Solo backend (desde raíz o desde la carpeta backend):
+npm run dev:backend ó npm run dev ó npm start
+Solo frontend (desde raíz o carpeta frontend):
+npm run dev:frontend ó cd frontend npm start 
+
+Arranca la base de datos y pgAdmin
+
+Esto inicia los contenedores:
+PostgreSQL (pg-clinica)
+pgAdmin (pgadmin-clinica)
+
+Arranca tu backend y frontend
+Si usas el comando monorepo:
+npm start
+También puedes arrancar por separado:
+Solo backend (desde raíz o desde la carpeta backend):
+npm run dev:backend ó npm run dev ó npm start
+Solo frontend (desde raíz o carpeta frontend):
+npm run dev:frontend ó cd frontend npm start 
+
+Accede al frontend
+Por ejemplo, en tu navegador:
+http://localhost:4200/
+El backend suele estar en:
+http://localhost:3000/
+
+Accede a pgAdmin si lo necesitas:
+http://localhost:8080/
+Usa el email y pass que pusiste en el docker-compose para pgAdmin.
+
+RESUMEN:
+Inicia Docker Desktop (imprescindible para la base de datos).
+docker-compose up -d
+
+En otra terminal:
+npm start (o los comandos individuales para backend/frontend, como prefieras)
+
+Abre el frontend en el navegador.

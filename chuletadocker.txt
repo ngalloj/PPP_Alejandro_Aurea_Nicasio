@@ -1,0 +1,21 @@
+Si haces:
+docker-compose down
+docker-compose up -d
+... los datos deberían persistir si el volumen sigue presente.
+
+docker-compose down -v  # elimina el volumen (olvida los datos actuales, solo para limpiar)
+docker-compose up -d    # inicia desde cero y crea el volumen de nuevo
+
+APAGAR LOS SERVICIOS CON docker-compose down
+
+PARA VOLVER A INICIAR docker-compose up -d
+
+
+OJO EN EL DOCKER-COMPOSE:
+Recuerda:
+Usa SIEMPRE esta ruta corregida para el volumen:
+db-data:/var/lib/postgresql/data
+
+NO uses docker-compose down -v salvo que quieras borrar todo.
+
+Un simple docker-compose down es seguro y mantiene tus datos.

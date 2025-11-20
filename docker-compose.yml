@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/15/data  # <- Corregido aquí
+      - db-data:/var/lib/postgresql/data  # <- Corregido aquí
 
   pgadmin:
     image: dpage/pgadmin4
