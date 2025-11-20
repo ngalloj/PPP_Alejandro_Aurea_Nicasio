@@ -2,30 +2,27 @@
 const jwt = require('jsonwebtoken');
 const SECRET = 'admin1234';
 
-// Middleware: verifica JWT
-exports.authenticateToken = (req, res, next) => {
+// Middleware: verifica JWT (token en autorización tipo Bearer)
+exports.auth = (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  console.log('Authorization header:', authHeader);
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Falta token' });
   jwt.verify(token, SECRET, (err, user) => {
     if (err) {
-      console.log('JWT VERIFY ERROR:', err);
       return res.status(403).json({ error: 'Token inválido' });
     }
-    req.usuario = user;
+    req.usuario = user; // payload del JWT, incluye id, email, rol, etc.
     next();
   });
 };
 
-// Middleware: solo un rol permitido
+// Middleware: exige que el usuario tenga un rol (string o en array)
 exports.requireRole = (role) => (req, res, next) => {
   if (!req.usuario || req.usuario.rol !== role)
     return res.status(403).json({ error: `Acceso solo para ${role}` });
   next();
 };
 
-// Middleware: permite varios roles
 exports.allowRoles = (rolesArray) => (req, res, next) => {
   const rol = req.usuario?.rol;
   if (!rolesArray.includes(rol)) {

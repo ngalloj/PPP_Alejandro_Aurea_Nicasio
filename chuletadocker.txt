@@ -19,3 +19,67 @@ db-data:/var/lib/postgresql/data
 NO uses docker-compose down -v salvo que quieras borrar todo.
 
 Un simple docker-compose down es seguro y mantiene tus datos.
+
+
+Consejos de flujo moderno
+Levanta normalmente el entorno con uno de estos comandos:
+
+bash
+docker-compose up -d     # Todo en contenedores, portable y rápido
+npm start                # Si quieres todo fuera de docker rápido (dev hot reload local)
+La build Docker es mucho más lenta porque instala todo y compila cada vez. Solo hazla cuando hay cambios de dependencias, o para poner en producción/compartir detalles del proyecto.
+
+¿Te sale muy lento solo la PRIMERA vez?
+Eso es esperado. El resto de veces debe ser inmediato, salvo el primer build tras limpieza de node_modules o el ng serve si cambias dependencias.
+
+RESUMEN FINAL
+Ahora ya todo es rendimiento normal: 10-30 segundos de arranque inicial en local es aceptable para Angular moderno.
+
+Backend y base de datos están corriendo en segundos.
+
+¡Tu entorno está robusto, moderno y listo para desarrollar o demostrar!
+
+¿Cuándo deberías usar Docker Compose y cuándo npm start local?
+docker-compose up -d
+
+Para integración, pruebas finales, y entregar la solución (demostraciones, deploy, producción, compatibilidad…).
+
+Build automatizado, dependencias estables, entorno controlado.
+
+npm start
+
+Para desarrollo diario, cambios rápidos, debug/análisis en caliente con consola y navegador.
+
+Hot reload, autorestart de backend y frontend.
+
+¿Por qué en pgAdmin Docker (http://localhost:8080) no ves ningún servidor registrado, pero en pgAdmin local sí?
+
+Explicación técnica:
+pgAdmin en Docker (la interfaz web en http://localhost:8080) NO tiene por defecto ningún servidor configurado.
+
+Cada vez que lo abres por primera vez o reseteas el contenedor, tienes que agregar manualmente tu servidor PostgreSQL.
+
+Esto es normal y esperado por seguridad y por cómo Docker gestiona la persistencia.
+
+pgAdmin instalado localmente en tu PC conserva tus conexiones locales configuradas por ti (y suele detectar servidores de ejemplo o antiguos).
+
+¿Cómo solucionarlo y ver tu base de datos en Docker pgAdmin?
+Haz clic en "Agregar un Nuevo Servidor" (o "Add New Server" en inglés).
+
+En la pestaña "General", ponle un nombre (por ejemplo: clinica-veterinaria).
+
+Ve a la pestaña "Connection":
+
+Host: db (exactamente así, es el nombre del servicio en docker-compose.yml)
+
+Port: 5432
+
+Username: postgres
+
+Password: admin1234
+
+Marca Save Password si quieres no tener que escribirla cada vez.
+
+Guarda.
+
+Ahora deberías ver tu servidor, tus bases de datos y tablas creadas por Sequelize.

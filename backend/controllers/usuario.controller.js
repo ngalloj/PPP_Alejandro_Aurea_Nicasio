@@ -1,5 +1,5 @@
 // backend/controllers/usuario.controllers.js
-const { Usuario } = require('../models');
+const { Usuario, Animal } = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const SECRET = 'admin1234';
@@ -12,17 +12,16 @@ exports.login = async (req, res) => {
     if (!usuario)
       return res.status(401).json({ error: 'Credenciales inválidas (usuario)' });
 
-    // Auditar passwords
     const passwordCorrecta = await bcrypt.compare(password, usuario.password);
     console.log(`¿Password coincide para ${email}? => ${passwordCorrecta}`);
     if (!passwordCorrecta)
       return res.status(401).json({ error: 'Credenciales inválidas (password)' });
 
-    const { id, email: userEmail, rol } = usuario.get();
-    const token = jwt.sign({ id, email: userEmail, rol }, SECRET, { expiresIn: '4h' });
+    const { id, email: userEmail, rol, dni } = usuario.get();
+    const token = jwt.sign({ id, email: userEmail, rol, dni }, SECRET, { expiresIn: '4h' });
     return res.json({
       mensaje: 'Login correcto',
-      usuario: { id, email: userEmail, rol },
+      usuario: { id, email: userEmail, rol, dni },
       token
     });
   } catch (err) {
@@ -30,49 +29,47 @@ exports.login = async (req, res) => {
   }
 };
 
-// Listar todos
+// Listar todos (con DNI y animales si se requiere)
 exports.getAll = async (req, res) => {
   try {
-    const usuarios = await Usuario.findAll();
+    const usuarios = await Usuario.findAll({ include: [{ model: Animal }] });
     res.json(usuarios.map(u => {
-      const { id, email, rol } = u.get();
-      return { id, email, rol };
+      const { id, email, rol, dni, Animales } = u.get({ plain: true });
+      return { id, email, rol, dni, animales: Animales };
     }));
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
+
 // Obtener por ID
 exports.getById = async (req, res) => {
   try {
-    const usuario = await Usuario.findByPk(req.params.id);
+    const usuario = await Usuario.findByPk(req.params.id, { include: [{ model: Animal }] });
     if (!usuario)
       return res.status(404).json({ error: 'No encontrado' });
-    const { id, email, rol } = usuario.get();
-    res.json({ id, email, rol });
+    const { id, email, rol, dni, Animales } = usuario.get({ plain: true });
+    res.json({ id, email, rol, dni, animales: Animales });
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
+
 // Crear
 exports.create = async (req, res) => {
   try {
-    // QUIÉN está creando
-    const rolSolicitante = req.usuario.rol; // el rol del usuario autenticado
+    const rolSolicitante = req.usuario?.rol || 'admin'; // default a admin si no hay autenticado
     let { password, rol, ...resto } = req.body;
+    if (!resto.dni) return res.status(400).json({ error: 'Falta dni' });
 
-    // Recepcionista SOLO puede crear clientes
     if (rolSolicitante === 'recepcionista' && rol !== 'cliente') {
       return res.status(403).json({ error: 'Recepcionista sólo puede crear clientes.' });
     }
-
-    // Evitar que un cliente se autologue y cree usuarios
     if (rolSolicitante === 'cliente') {
       return res.status(403).json({ error: 'Cliente no autorizado para crear usuarios.' });
     }
+    if (!rol) rol = 'cliente';
 
-    if (!rol) rol = 'cliente'; // Previene rol vacío (o puedes controlar en frontend/validación extra)
-
-    if (password) password = await require('bcrypt').hash(password, 10);
-    const usuario = await require('../models').Usuario.create({ ...resto, password, rol });
-    const { id, email } = usuario.get();
-    res.status(201).json({ id, email, rol });
+    if (password) password = await bcrypt.hash(password, 10);
+    const usuario = await Usuario.create({ ...resto, password, rol });
+    const { id, email, dni: dniCreado } = usuario.get();
+    res.status(201).json({ id, email, rol, dni: dniCreado });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -88,6 +85,7 @@ exports.update = async (req, res) => {
     res.json({ actualizado });
   } catch (err) { res.status(400).json({ error: err.message }); }
 };
+
 // Eliminar
 exports.delete = async (req, res) => {
   try {

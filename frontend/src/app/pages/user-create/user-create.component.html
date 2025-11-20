@@ -4,8 +4,13 @@
   <form #f="ngForm" (ngSubmit)="crearUsuario()" autocomplete="off">
     <label for="email">Email:</label>
     <input type="email" id="email" required name="email" [(ngModel)]="email" autocomplete="off"/><br>
+    
     <label for="password">Contraseña:</label>
     <input type="password" id="password" required name="password" [(ngModel)]="password" autocomplete="new-password"/><br>
+    
+    <label for="dni">DNI:</label>
+    <input type="text" id="dni" required name="dni" [(ngModel)]="dni" autocomplete="off"/><br>
+    
     <label for="rol">Rol:</label>
     <select id="rol" required name="rol" [(ngModel)]="rol" [disabled]="auth.getRole() === 'recepcionista'">
       <option *ngFor="let r of rolesPosibles" [value]="r">{{ r }}</option>

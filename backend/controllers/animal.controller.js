@@ -1,26 +1,33 @@
 // backend/controllers/animal.controller.js
-const { Animal, Cita } = require('../models');
+const { Animal, Cita, Usuario } = require('../models');
 
-// Listar todos los animales
+// Listar todos los animales (con dueño y paginación)
 exports.getAll = async (req, res) => {
   const page = +req.query.page || 1;
   const limit = +req.query.limit || 10;
   const offset = (page - 1) * limit;
-  const { rows, count } = await Animal.findAndCountAll({ limit, offset });
+  const { rows, count } = await Animal.findAndCountAll({
+    include: [{ model: Usuario }, { model: Cita }],
+    limit,
+    offset
+  });
   res.json({ total: count, data: rows, page, pages: Math.ceil(count / limit) });
 };
 
-// Buscar por ID
+// Buscar animal por ID (con citas y dueño)
 exports.getById = async (req, res) => {
-  const animal = await Animal.findByPk(req.params.id, { include: Cita });
+  const animal = await Animal.findByPk(req.params.id, {
+    include: [{ model: Usuario }, { model: Cita }]
+  });
   if (animal) res.json(animal);
   else res.status(404).json({ error: 'No encontrado' });
 };
 
-// Crear animal
+// Crear animal (requiere usuario_id)
 exports.create = async (req, res) => {
   try {
     if (!req.body.nombre) throw new Error('Falta nombre');
+    if (!req.body.usuario_id) throw new Error('Falta usuario_id (dueño)');
     const animal = await Animal.create(req.body);
     res.status(201).json(animal);
   } catch (err) {

@@ -1,18 +1,17 @@
 // backend/routes/animal.routes.js
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../controllers/animal.controller');
-const auth = require('../middlewares/auth');
+const animalController = require('../controllers/animal.controller');
+const { auth, allowRoles } = require('../middlewares/auth');
+const { validarCampos, validarAnimal } = require('../middlewares/validators');
 
 // Rutas públicas
 router.get('/', ctrl.getAll);
 router.get('/:id', ctrl.getById);
 
 // Rutas protegidas (requieren login/JWT)
-router.post('/', auth.authenticateToken, ctrl.create);
-router.put('/:id', auth.authenticateToken, ctrl.update);
-router.delete('/:id', auth.authenticateToken, ctrl.delete);
+router.post('/', auth, validarAnimal, validarCampos, animalController.create);
+router.put('/:id', auth, validarAnimal, validarCampos, animalController.update);
+router.delete('/:id', auth, allowRoles(['admin', 'recepcionista']), animalController.delete);
 
 module.exports = router;
-
-

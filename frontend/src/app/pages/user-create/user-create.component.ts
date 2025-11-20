@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
 export class UserCreateComponent {
   email = '';
   password = '';
+  dni = '';
   rol = '';
   mensaje = '';
   rolesPosibles = ['admin', 'veterinario', 'recepcionista', 'cliente'];
@@ -31,23 +32,25 @@ export class UserCreateComponent {
     const miRol = this.auth.getRole();
     if (miRol === 'recepcionista') {
       this.rolesPosibles = ['cliente'];
-      this.rol = 'cliente'; // Valor por defecto para facilitar
+      this.rol = 'cliente'; // Valor por defecto
     }
-  }  
+  }
 
   crearUsuario() {
     // Si recepcionista, fuerza rol a cliente por seguridad extra
     let rolToSend = this.rol;
     if (this.auth.getRole() === 'recepcionista') rolToSend = 'cliente';
 
+    // IMPORTANTE: Añadimos dni al objeto enviado
     this.http.post('http://localhost:3000/api/usuario', {
       email: this.email,
       password: this.password,
-      rol: rolToSend
+      rol: rolToSend,
+      dni: this.dni
     }).subscribe({
       next: res => {
         this.mensaje = 'Usuario creado con éxito';
-        this.email = this.password = this.rol = '';
+        this.email = this.password = this.dni = this.rol = '';
         if (this.auth.getRole() === 'recepcionista') this.rol = 'cliente';
       },
       error: err => {
