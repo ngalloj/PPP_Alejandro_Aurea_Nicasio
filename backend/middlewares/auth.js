@@ -4,6 +4,9 @@ const SECRET = 'admin1234';
 
 // Middleware: verifica JWT (token en autorización tipo Bearer)
 exports.auth = (req, res, next) => {
+  // Permite siempre la petición OPTIONS (preflight CORS)
+  if (req.method === 'OPTIONS') return next();
+  
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Falta token' });

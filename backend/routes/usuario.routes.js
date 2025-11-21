@@ -1,6 +1,7 @@
 // backend/routes/usuario.routes.js
 const express = require('express');
 const router = express.Router();
+
 const usuarioController = require('../controllers/usuario.controller');
 const { auth, allowRoles } = require('../middlewares/auth');
 const { validarCampos, validarUsuario } = require('../middlewares/validators');

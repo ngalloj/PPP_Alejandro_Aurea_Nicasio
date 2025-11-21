@@ -1,12 +1,18 @@
 <!-- frontend/src/app/shared/sidenav/sidenav.component.html -->
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
-    <mat-toolbar>DGMascotas</mat-toolbar>
+    <!-- Toolbar del sidebar -->
+    <mat-toolbar style="background: #fff;">
+      <!-- Logo exacto 110x38px -->
+      <img src="assets/logos/dgmascotas_logo_110x38.png" alt="Logo exacto" width="110" height="38" />
+
+    </mat-toolbar>
+
     <div style="font-size:10px;color:gray">
       Usuario: {{ usuarioLogueado | json }}
     </div>
     <mat-nav-list>
-      <!-- Inicio - para todos los usuarios -->
+      <!-- Inicio -->
       <a mat-list-item routerLink="/home" (click)="drawer.close()">
         <mat-icon>home</mat-icon>
         <span>Inicio</span>
@@ -40,7 +46,7 @@
         <span>Mi Perfil</span>
       </a>
 
-      <!-- Crear usuario: solo admin y veterinario -->
+      <!-- Crear usuario: solo admin, veterinario y recepcionista -->
       <a *ngIf="usuarioLogueado && (usuarioLogueado.rol === 'admin' || usuarioLogueado.rol === 'veterinario' || usuarioLogueado.rol === 'recepcionista')"
         mat-list-item routerLink="/crear-usuario" (click)="drawer.close()">
         <mat-icon>person_add</mat-icon>
@@ -56,9 +62,16 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
+    <!-- Toolbar superior (dentro de mat-sidenav-content) -->
     <mat-toolbar color="primary">
-      <button mat-icon-button (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
       <span>Gestión Clínica</span>
+      <!-- Logo exacto 110x38px -->
+      <img src="assets/logos/dgmascotas_logo_110x38.png" alt="Logo exacto" width="110" height="38" />
+
+      <span style="font-size: 1.12em; font-weight: bold;">DGMascotas</span>
     </mat-toolbar>
     <div class="main-content">
       <router-outlet></router-outlet>

@@ -1,1 +1,0 @@
-// frontend/src/app/guards/home/home.component.ts

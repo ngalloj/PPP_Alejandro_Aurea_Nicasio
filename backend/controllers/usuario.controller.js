@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const SECRET = 'admin1234';
 
-// Login
+// Login (NO CAMBIAR - ya está bien)
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Listar todos (con DNI y animales si se requiere)
+// Listar todos (NO CAMBIAR - ya está bien)
 exports.getAll = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll({ include: [{ model: Animal }] });
@@ -40,7 +40,7 @@ exports.getAll = async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
-// Obtener por ID
+// Obtener por ID (NO CAMBIAR - ya está bien)
 exports.getById = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id, { include: [{ model: Animal }] });
@@ -51,19 +51,25 @@ exports.getById = async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
-// Crear
+// ✅ CREAR - AÑADIR VALIDACIÓN DE CLIENTE
 exports.create = async (req, res) => {
   try {
-    const rolSolicitante = req.usuario?.rol || 'admin'; // default a admin si no hay autenticado
+    const rolSolicitante = req.usuario?.rol || 'admin';
     let { password, rol, ...resto } = req.body;
-    if (!resto.dni) return res.status(400).json({ error: 'Falta dni' });
+    
+    if (!resto.dni) 
+      return res.status(400).json({ error: 'Falta dni' });
 
-    if (rolSolicitante === 'recepcionista' && rol !== 'cliente') {
-      return res.status(403).json({ error: 'Recepcionista sólo puede crear clientes.' });
-    }
+    // ✅ NUEVO: Cliente NO puede crear usuarios
     if (rolSolicitante === 'cliente') {
       return res.status(403).json({ error: 'Cliente no autorizado para crear usuarios.' });
     }
+
+    // ✅ YA EXISTÍA: Recepcionista solo puede crear clientes
+    if (rolSolicitante === 'recepcionista' && rol !== 'cliente') {
+      return res.status(403).json({ error: 'Recepcionista sólo puede crear clientes.' });
+    }
+    
     if (!rol) rol = 'cliente';
 
     if (password) password = await bcrypt.hash(password, 10);
@@ -75,9 +81,16 @@ exports.create = async (req, res) => {
   }
 };
 
-// Actualizar
+// ✅ ACTUALIZAR - AÑADIR VALIDACIÓN
 exports.update = async (req, res) => {
   try {
+    const rolSolicitante = req.usuario?.rol;
+    
+    // ✅ NUEVO: Solo admin y veterinario pueden modificar
+    if (rolSolicitante !== 'admin' && rolSolicitante !== 'veterinario') {
+      return res.status(403).json({ error: 'Solo admin y veterinario pueden modificar usuarios.' });
+    }
+
     let datos = { ...req.body };
     if (datos.password)
       datos.password = await bcrypt.hash(datos.password, 10);
@@ -86,9 +99,16 @@ exports.update = async (req, res) => {
   } catch (err) { res.status(400).json({ error: err.message }); }
 };
 
-// Eliminar
+// ✅ ELIMINAR - AÑADIR VALIDACIÓN
 exports.delete = async (req, res) => {
   try {
+    const rolSolicitante = req.usuario?.rol;
+    
+    // ✅ NUEVO: Solo admin y veterinario pueden eliminar
+    if (rolSolicitante !== 'admin' && rolSolicitante !== 'veterinario') {
+      return res.status(403).json({ error: 'Solo admin y veterinario pueden eliminar usuarios.' });
+    }
+
     await Usuario.destroy({ where: { id: req.params.id } });
     res.json({ eliminado: true });
   } catch (err) { res.status(400).json({ error: err.message }); }

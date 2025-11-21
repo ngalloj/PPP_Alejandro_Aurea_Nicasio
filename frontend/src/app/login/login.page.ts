@@ -54,17 +54,32 @@ export class LoginPage {
         this.loading = false;
         if (response.token) {
           this.authService.saveToken(response.token);
-          this.admin = this.authService.isAdmin(); // Usa el método del servicio
-          this.router.navigate(['/users']);
+          const rol = this.authService.getUserRole();
+  
+          switch (rol) {
+            case 'admin':
+              this.router.navigate(['/admin']);
+              break;
+            case 'veterinario':
+              this.router.navigate(['/animales']);
+              break;
+            case 'recepcionista':
+              this.router.navigate(['/citas-clientes']);
+              break;
+            case 'cliente':
+              this.router.navigate(['/mis-animales']);
+              break;
+            default:
+              this.router.navigate(['/login']);
+          }
         } else {
           this.errorMsg = "Respuesta inesperada del servidor.";
         }
       },
       error: (error) => {
         this.loading = false;
-        this.errorMsg =
-          error.error?.message || 'Credenciales incorrectas o error de red.';
+        this.errorMsg = error.error?.message || 'Credenciales incorrectas o error de red.';
       }
     });
   }
-}
+}  

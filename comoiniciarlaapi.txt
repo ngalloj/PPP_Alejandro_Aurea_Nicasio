@@ -36,3 +36,11 @@ Inicia Docker Desktop (imprescindible para la base de datos).
 Desde Terminal MS-DOS administrador, en la carperta raíz de la api, ejecuta: docker-compose up -d
 Desde VSC, en terminal: npm start (o los comandos individuales para backend/frontend, como prefieras)
 Abre el frontend en el navegador.
+
+
+
+
+Inicio por separado de backend y frontend:
+
+Backend -> npm run dev
+Frontend -> ng server
