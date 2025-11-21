@@ -1,0 +1,19 @@
+Cierra tu frontend (Angular/Ionic):
+
+Detén con Ctrl+C si está en terminal.
+
+Cierra tu backend (Express):
+
+Detén con Ctrl+C si está en terminal, o para todo en Docker, sigue al paso 4.
+
+Asegúrate de que nadie está usando la web/app (nadie más escribiendo datos).
+
+Haz el backup en pgAdmin / o con el comando docker como indiqué antes.
+Ejemplo Docker CLI:
+docker exec -t pg-clinica pg_dump -U postgres clinica_vet > 
+backup_clinica_vet.sql
+
+Cuando termine la copia, ya se puede ejecutar:
+docker-compose down
+
+Apaga/reinicia tu equipo

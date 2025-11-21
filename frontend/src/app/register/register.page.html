@@ -1,3 +1,4 @@
+<!-- frontend/src/app/register/register.page.html -->
 <ion-content>
   <form (ngSubmit)="register()" #registerForm="ngForm">
     <ion-header>
@@ -16,7 +17,8 @@
 
     <ion-item>
       <ion-label position="floating">Contraseña</ion-label>
-      <ion-input type="password" name="password" required minlength="6" [(ngModel)]="password" #passwordInput="ngModel"></ion-input>
+      <ion-input type="password" name="password" required minlength="6" [(ngModel)]="password"
+        #passwordInput="ngModel"></ion-input>
     </ion-item>
     <div *ngIf="passwordInput.invalid && passwordInput.touched" style="color:red; margin-left: 16px;">
       La contraseña debe tener al menos 6 caracteres.

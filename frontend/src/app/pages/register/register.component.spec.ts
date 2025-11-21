@@ -1,3 +1,4 @@
+// frontend/src/app/pages/register/register.component.spec.ts
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 

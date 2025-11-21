@@ -1,3 +1,4 @@
+<!-- frontend/src/app/login/login.page.html -->
 <ion-content>
   <form (ngSubmit)="login()" #loginForm="ngForm">
     <ion-header>
@@ -8,12 +9,7 @@
 
     <ion-item>
       <ion-label position="floating">Email</ion-label>
-      <ion-input
-        type="email"
-        required
-        name="email"
-        [(ngModel)]="email"
-        #emailInput="ngModel">
+      <ion-input type="email" required name="email" [(ngModel)]="email" #emailInput="ngModel">
       </ion-input>
     </ion-item>
     <div *ngIf="emailInput.invalid && emailInput.touched" style="color:red; margin-left: 16px;">
@@ -22,22 +18,14 @@
 
     <ion-item>
       <ion-label position="floating">Contraseña</ion-label>
-      <ion-input
-        type="password"
-        required
-        name="password"
-        [(ngModel)]="password"
-        #passwordInput="ngModel">
+      <ion-input type="password" required name="password" [(ngModel)]="password" #passwordInput="ngModel">
       </ion-input>
     </ion-item>
     <div *ngIf="passwordInput.invalid && passwordInput.touched" style="color:red; margin-left: 16px;">
       La contraseña es obligatoria.
     </div>
 
-    <ion-button
-      expand="block"
-      type="submit"
-      [disabled]="loginForm.invalid || loading">
+    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || loading">
       Entrar
     </ion-button>
     <div *ngIf="loading" style="text-align:center; margin-top:8px;">Cargando...</div>

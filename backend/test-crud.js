@@ -3,10 +3,14 @@ const { sequelize, Animal, Usuario, Cita } = require('./models');
 async function testDB() {
   await sequelize.sync({ alter: true }); // Asegura estructura
   // CREA UN USUARIO
-  const usuario = await Usuario.create({
-    email: 'prueba@correo.com',
-    password: '1234'
-  });
+  const bcrypt = require('bcrypt');
+const pwHash = bcrypt.hashSync('1234', 10);
+
+const usuario = await Usuario.create({
+  email: 'prueba@correo.com',
+  password: pwHash
+});
+
 
   // CREA UN ANIMAL
   const animal = await Animal.create({

@@ -1,3 +1,4 @@
+// frontend/src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,49 +9,106 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string) {
-    return this.http.post<{token:string}>(`${this.baseUrl}/login`, { email, password });
+  login(email: string, password: string): Observable<{ usuario: any, token: string }> {
+    return this.http.post<{ usuario: any, token: string }>(`${this.baseUrl}/login`, { email, password });
   }
 
-  saveToken(token: string) { localStorage.setItem('token', token); }
-  getToken() { return localStorage.getItem('token'); }
+  saveToken(token: string): void { 
+    localStorage.setItem('token', token); 
+  }
+  
+  getToken(): string | null { 
+    return localStorage.getItem('token'); 
+  }
+  
+  saveUsuario(usuario: any): void { 
+    localStorage.setItem('usuario', JSON.stringify(usuario)); 
+  }
+  
+  getUsuario(): any {
+    const u = localStorage.getItem('usuario');
+    return u ? JSON.parse(u) : null;
+  }
   
   isLoggedIn(): boolean {
     const token = this.getToken();
-    // Debe ser un JWT válido (tres partes separadas por '.')
     if (!token || token.split('.').length !== 3) return false;
-    // Aquí puedes añadir más validaciones como fecha de expiración si el payload la tiene
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       if (payload.exp) {
-        // Si tu JWT tiene fecha de expiración
         const now = Math.floor(Date.now() / 1000);
         if (payload.exp < now) return false;
       }
       return true;
-    } catch {
-      return false;
+    } catch { 
+      return false; 
     }
   }
-
-  isAdmin(): boolean {
+  
+  getUserFromToken(): any {
     const t = this.getToken();
-    if (!t || t.trim() === '' || t.split('.').length !== 3) return false;
-    try {
-      const payload = JSON.parse(atob(t.split('.')[1]));
-      return payload.rol === 'admin';
-    } catch (error) {
-      console.error('Error al decodificar el token:', error);
-      return false;
+    if (!t) return null;
+    try { 
+      return JSON.parse(atob(t.split('.')[1])); 
+    } catch { 
+      return null; 
     }
   }
 
-  logout() {
+  // ✅ MÉTODO PRINCIPAL
+  getRole(): string {
+    const usuario = this.getUsuario();
+    if (usuario && usuario.rol) return usuario.rol;
+    
+    const tokenData = this.getUserFromToken();
+    return tokenData?.rol || '';
+  }
+
+  // ✅ ALIAS (para compatibilidad)
+  getUserRole(): string {
+    return this.getRole();
+  }
+
+  // ✅ MÉTODOS DE VERIFICACIÓN
+  isAdmin(): boolean {
+    return this.getRole() === 'admin';
+  }
+
+  isVeterinario(): boolean {
+    return this.getRole() === 'veterinario';
+  }
+
+  isRecepcionista(): boolean {
+    return this.getRole() === 'recepcionista';
+  }
+
+  isCliente(): boolean {
+    return this.getRole() === 'cliente';
+  }
+
+  // ✅ PERMISOS COMPUESTOS
+  canModifyUsers(): boolean {
+    const rol = this.getRole();
+    return rol === 'admin' || rol === 'veterinario';
+  }
+
+  canDeleteUsers(): boolean {
+    const rol = this.getRole();
+    return rol === 'admin' || rol === 'veterinario';
+  }
+
+  canCreateUsers(): boolean {
+    const rol = this.getRole();
+    return rol === 'admin' || rol === 'veterinario' || rol === 'recepcionista';
+  }
+
+  canAccessFullCRUD(): boolean {
+    const rol = this.getRole();
+    return rol === 'admin' || rol === 'veterinario' || rol === 'recepcionista';
+  }
+
+  logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
   }
-
-  register(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/register`, { email, password });
-  }
-
 }

@@ -1,3 +1,4 @@
+// backend/seeders/seed.js
 const { sequelize, Animal, Usuario, Cita } = require('../models');
 
 async function seed() {

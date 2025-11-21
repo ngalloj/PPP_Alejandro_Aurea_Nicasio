@@ -1,0 +1,47 @@
+<!-- frontend/src/app/pages/clientes-citas/clientes-citas.component.html -->
+<mat-card>
+  <mat-card-title>Citas y Clientes</mat-card-title>
+  <mat-card-content>
+    <!-- Formulario de creación de citas -->
+    <form [formGroup]="citaForm" (ngSubmit)="crearCita()" style="margin-bottom:20px;">
+      <mat-form-field>
+        <input matInput formControlName="cliente" placeholder="Cliente" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="animal" placeholder="Animal" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="date" formControlName="fecha" placeholder="Fecha" required>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!citaForm.valid">Guardar cita</button>
+    </form>
+
+    <!-- Tabla de citas -->
+    <table mat-table [dataSource]="citas" class="mat-elevation-z2">
+      <!-- Cliente -->
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+        <td mat-cell *matCellDef="let cita">{{ cita.cliente }}</td>
+      </ng-container>
+      <!-- Animal -->
+      <ng-container matColumnDef="animal">
+        <th mat-header-cell *matHeaderCellDef>Animal</th>
+        <td mat-cell *matCellDef="let cita">{{ cita.animal }}</td>
+      </ng-container>
+      <!-- Fecha -->
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+        <td mat-cell *matCellDef="let cita">{{ cita.fecha | date:'shortDate' }}</td>
+      </ng-container>
+      <!-- Acciones -->
+      <ng-container matColumnDef="accion">
+        <th mat-header-cell *matHeaderCellDef>Acción</th>
+        <td mat-cell *matCellDef="let cita">
+          <button mat-button (click)="verCliente(cita)">Ver Cliente</button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

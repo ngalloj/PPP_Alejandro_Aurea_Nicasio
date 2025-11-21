@@ -1,3 +1,4 @@
+// frontend/src/app/pages/admin-page/admin-page.component.ts
 import { Component, OnInit } from '@angular/core';
 
 @Component({
