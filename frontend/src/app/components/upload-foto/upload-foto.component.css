@@ -1,0 +1,142 @@
+/* frontend/src/app/components/upload-foto/upload-foto.component.css */
+
+.upload-foto-container {
+    margin: 20px 0;
+    padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+    background: #f9f9f9;
+  }
+  
+  .upload-foto-container h3 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  .preview-container {
+    position: relative;
+    margin-bottom: 15px;
+    display: inline-block;
+  }
+  
+  .preview-image {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  .btn-limpiar {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  
+  .btn-limpiar:hover {
+    background: #c0392b;
+  }
+  
+  .botones-upload {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn-upload, .btn-webcam {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+  }
+  
+  .btn-upload {
+    background: #3498db;
+    color: white;
+  }
+  
+  .btn-upload:hover {
+    background: #2980b9;
+  }
+  
+  .btn-webcam {
+    background: #2ecc71;
+    color: white;
+  }
+  
+  .btn-webcam:hover {
+    background: #27ae60;
+  }
+  
+  .webcam-container {
+    margin-top: 20px;
+  }
+  
+  .video-preview {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  .webcam-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .btn-capturar {
+    background: #27ae60;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .btn-capturar:hover {
+    background: #229954;
+  }
+  
+  .btn-cancelar {
+    background: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .btn-cancelar:hover {
+    background: #c0392b;
+  }
+  
+  @media (max-width: 768px) {
+    .preview-image {
+      max-width: 100%;
+    }
+    
+    .botones-upload {
+      flex-direction: column;
+    }
+    
+    .btn-upload, .btn-webcam {
+      width: 100%;
+    }
+  }
+  

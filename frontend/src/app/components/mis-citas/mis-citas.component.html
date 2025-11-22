@@ -1,0 +1,129 @@
+<!-- frontend/src/app/components/mis-citas/mis-citas.component.html -->
+
+<div class="mis-citas-container">
+  <h1>Mis Citas</h1>
+
+  <!-- Citas Futuras -->
+  <mat-card class="citas-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>event_upcoming</mat-icon>
+        Citas Próximas
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="cargando" class="loading">
+        Cargando citas...
+      </div>
+      
+      <div *ngIf="!cargando && citasFuturas.length === 0" class="no-citas">
+        <mat-icon>event_busy</mat-icon>
+        <p>No tienes citas programadas</p>
+      </div>
+
+      <table mat-table [dataSource]="citasFuturas" *ngIf="!cargando && citasFuturas.length > 0" class="mat-elevation-z2">
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let cita">{{ formatearFecha(cita.fecha) }}</td>
+        </ng-container>
+
+        <!-- Hora Column -->
+        <ng-container matColumnDef="hora">
+          <th mat-header-cell *matHeaderCellDef>Hora</th>
+          <td mat-cell *matCellDef="let cita">{{ cita.hora }}</td>
+        </ng-container>
+
+        <!-- Animal Column -->
+        <ng-container matColumnDef="animal">
+          <th mat-header-cell *matHeaderCellDef>Animal</th>
+          <td mat-cell *matCellDef="let cita">
+            <span *ngIf="cita.animal">
+              {{ cita.animal.nombre }} ({{ cita.animal.especie }})
+            </span>
+            <span *ngIf="!cita.animal">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Motivo Column -->
+        <ng-container matColumnDef="motivo">
+          <th mat-header-cell *matHeaderCellDef>Motivo</th>
+          <td mat-cell *matCellDef="let cita">{{ cita.motivo }}</td>
+        </ng-container>
+
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let cita">
+            <mat-chip [color]="getEstadoColor(cita.estado)" selected>
+              {{ cita.estado }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Citas Pasadas -->
+  <mat-card class="citas-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>history</mat-icon>
+        Historial de Citas
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="!cargando && citasPasadas.length === 0" class="no-citas">
+        <mat-icon>history_toggle_off</mat-icon>
+        <p>No tienes citas anteriores</p>
+      </div>
+
+      <table mat-table [dataSource]="citasPasadas" *ngIf="!cargando && citasPasadas.length > 0" class="mat-elevation-z2">
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let cita">{{ formatearFecha(cita.fecha) }}</td>
+        </ng-container>
+
+        <!-- Hora Column -->
+        <ng-container matColumnDef="hora">
+          <th mat-header-cell *matHeaderCellDef>Hora</th>
+          <td mat-cell *matCellDef="let cita">{{ cita.hora }}</td>
+        </ng-container>
+
+        <!-- Animal Column -->
+        <ng-container matColumnDef="animal">
+          <th mat-header-cell *matHeaderCellDef>Animal</th>
+          <td mat-cell *matCellDef="let cita">
+            <span *ngIf="cita.animal">
+              {{ cita.animal.nombre }} ({{ cita.animal.especie }})
+            </span>
+            <span *ngIf="!cita.animal">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Motivo Column -->
+        <ng-container matColumnDef="motivo">
+          <th mat-header-cell *matHeaderCellDef>Motivo</th>
+          <td mat-cell *matCellDef="let cita">{{ cita.motivo }}</td>
+        </ng-container>
+
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let cita">
+            <mat-chip [color]="getEstadoColor(cita.estado)" selected>
+              {{ cita.estado }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

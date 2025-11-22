@@ -10,6 +10,7 @@ import { MisAnimalesComponent } from './pages/mis-animales/mis-animales.componen
 import { ClientesCitasComponent } from './pages/clientes-citas/clientes-citas.component';
 import { AuthGuard } from './guards/auth.guard';
 import { UserCreateComponent } from './pages/user-create/user-create.component';
+import { MisCitasComponent } from './components/mis-citas/mis-citas.component';
 
 // Rutas de la aplicación
 export const routes: Routes = [
@@ -24,7 +25,8 @@ export const routes: Routes = [
   { path: 'animales', component: AnimalComponent, canActivate: [RoleGuard], data: { roles: ['veterinario', 'admin'] } },
   { path: 'mis-animales', component: MisAnimalesComponent, canActivate: [RoleGuard], data: { roles: ['cliente'] } },
   { path: 'citas-clientes', component: ClientesCitasComponent, canActivate: [RoleGuard], data: { roles: ['recepcionista', 'admin', 'veterinario'] } },
-
+  { path: 'mis-citas', component: MisCitasComponent, canActivate: [AuthGuard], data: { roles: ['cliente']}},
+  
   // Crear usuario / Solo admin y veterinario
   { 
     path: 'crear-usuario', 

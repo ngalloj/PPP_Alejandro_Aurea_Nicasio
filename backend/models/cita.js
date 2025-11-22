@@ -5,23 +5,30 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     fecha: { type: DataTypes.DATE, allowNull: false },
     motivo: DataTypes.STRING,
-    usuario_id: { // FK para usuario
-      type: DataTypes.INTEGER,
+    usuario_dni: { // CAMBIO: de usuario_id a usuario_dni
+      type: DataTypes.STRING,
+      allowNull: false,
       references: {
         model: 'usuarios',
+        key: 'dni'
+      }
+    },
+    animal_id: { // FK opcional para animal
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'animales',
         key: 'id'
       }
     }
-    // Puedes añadir también animal_id si la cita va ligada a un animal.
   }, {
     timestamps: false,
-    tableName: 'citas' // Nuevo nombre real de la tabla
+    tableName: 'citas'
   });
 
   Cita.associate = (models) => {
-    Cita.belongsTo(models.Usuario, { foreignKey: 'usuario_id' });
-    // Si añades animal_id:
-    // Cita.belongsTo(models.Animal, { foreignKey: 'animal_id' });
+    Cita.belongsTo(models.Usuario, { foreignKey: 'usuario_dni', targetKey: 'dni' });
+    Cita.belongsTo(models.Animal, { foreignKey: 'animal_id' });
   };
 
   return Cita;
