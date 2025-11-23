@@ -2,7 +2,8 @@
 
 ![image](https://github.com/user-attachments/assets/2f13286b-5869-407e-bf61-1952f9604631)
 
-# Clinica Veterinaria - Full stack with  FrontEnd: Ionic/Angular Backend: Node/Express+ Sequelize. This repo is a monorepo with folders frontend and backend
+# Clinica Veterinaria 
+# Full stack with  FrontEnd: Ionic/Angular Backend: Node/Express+ Sequelize. 
 
 As the header says, a project with Ionic, Express, Sequelize and MySQL based on the notes of Miguel Ángel Barrera is just that.
 
