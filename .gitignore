@@ -20,6 +20,7 @@ Thumbs.db
 # Ignorar outputs específicos
 chuletagit.txt
 treedir.txt
+*.txt
 
 # Ignorar lockfiles si no quieres compartirlos
 /backend/package-lock.json
