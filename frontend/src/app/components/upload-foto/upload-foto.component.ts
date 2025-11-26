@@ -1,6 +1,18 @@
 // frontend/src/app/components/upload-foto
 
 import { Component, EventEmitter, Output, ViewChild, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+
+imports: [
+  CommonModule,  // ← AGREGAR ESTO
+  MatButtonModule,
+  MatIconModule,
+  MatCardModule
+]
+
 
 @Component({
   selector: 'app-upload-foto',
