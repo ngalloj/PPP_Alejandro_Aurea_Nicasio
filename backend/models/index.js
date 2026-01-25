@@ -2,15 +2,14 @@
 'use strict';
 
 const { Sequelize, DataTypes } = require('sequelize');
-<<<<<<< HEAD
-const sequelize = new Sequelize('clinica_vet', 'postgres', 'admin1234', {
+/*const sequelize = new Sequelize('clinica_vet', 'postgres', 'admin1234', {
   host: 'localhost', //host: 'pg-clinica' -> el nombre del servicio en docker-compose host: 'localhost' -> en local 
-  dialect: 'mysql'
-=======
+  dialect: 'postgres'*/
+
+
 const sequelize = new Sequelize('clinica_vet', 'root', 'gamusino', {
   host: '127.0.0.1',
   dialect: 'mysql',
->>>>>>> d1271ca (Mis cambios locales)
 });
 
 // Modelos
