@@ -9,9 +9,10 @@ const usuarioRutas = require('./routes/usuario.routes');
 
 const app = express();
 
-console.log("=== EXPRESS CORS FIX START ===");
+//console.log("=== EXPRESS CORS FIX START ===");
 
 // --- Handler UNIVERSAL OPTIONS: DEBE SER EL PRIMERO ---
+/*
 app.use((req, res, next) => {
   console.log('Universal middleware:', req.method, req.path); // <--- deja el log!
   if (req.method === 'OPTIONS') {
@@ -23,11 +24,8 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-app.use(cors({
-  origin: 'http://localhost:4200',
-  credentials: true,
-}));
+*/
+app.use(cors());
 
 app.use(express.json());
 
