@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
-    "build": "ng build",
+    "build": "npm run build:frontend",
     "watch": "ng build --watch --configuration development",
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm start --prefix frontend",
