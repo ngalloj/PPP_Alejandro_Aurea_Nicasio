@@ -14,7 +14,8 @@ router.get('/animales', auth, animalController.getAll);
 router.get('/animales/:id', auth, animalController.getById);
 router.post('/animales', auth, animalController.uploadFoto, animalController.create); // ✅ Con upload
 router.put('/animales/:id', auth, animalController.uploadFoto, animalController.update); // ✅ Con upload
-router.delete('/animales/:id', auth, allowRoles(['admin', 'veterinario']), animalController.delete);
+router.delete('/animales/:id', auth, animalController.delete);
+
 
 // --- Usuarios CRUD ---
 router.get('/usuarios', auth, usuarioController.getAll);

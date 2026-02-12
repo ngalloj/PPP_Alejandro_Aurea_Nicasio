@@ -1,25 +1,53 @@
-// backend/models/index.js
-'use strict';
+// backend/models/index.js - VERSIÓN FINAL QUE FUNCIONA
 
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('clinica_vet', 'postgres', 'admin1234', {
-  host: 'localhost',
-  dialect: 'postgres'
+const config = require('../config/database');
+
+const env = process.env.NODE_ENV || 'development';
+const dbConfig = config[env];
+
+const sequelize = new Sequelize(
+  dbConfig.database,
+  dbConfig.username,
+  dbConfig.password,
+
+  {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    dialect: dbConfig.dialect,
+    logging: false
+  }
+);
+
+const db = {};
+
+// Cargar modelos (solo archivos .js en raíz de models/)
+const modelsToLoad = ['usuario', 'animal', 'cita', 'catalogo', 'facturacion', 'historiales', 'Inventory', 'Invoice'];
+
+modelsToLoad.forEach(modelName => {
+  try {
+    const model = require(`./${modelName}`)(sequelize, DataTypes);
+    db[model.name] = model;
+    console.log(`✅ Modelo cargado: ${model.name}`);
+  } catch (err) {
+    console.log(`⚠️  Modelo ${modelName} no encontrado o error: ${err.message}`);
+  }
 });
 
-// Modelos
-const Usuario = require('./usuario')(sequelize, DataTypes);
-const Animal = require('./animal')(sequelize, DataTypes);
-const Cita = require('./cita/cita')(sequelize, DataTypes);
+// Asociaciones
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    try {
+      db[modelName].associate(db);
+    } catch (err) {
+      console.log(`⚠️  Error asociación ${modelName}: ${err.message}`);
+    }
+  }
+});
 
-// Asociaciones ACTUALIZADAS
-Usuario.hasMany(Animal, { foreignKey: 'usuario_dni', sourceKey: 'dni' });
-Animal.belongsTo(Usuario, { foreignKey: 'usuario_dni', targetKey: 'dni' });
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+db.Factura = require('./Factura')(sequelize);
 
-Usuario.hasMany(Cita, { foreignKey: 'usuario_dni', sourceKey: 'dni' });
-Cita.belongsTo(Usuario, { foreignKey: 'usuario_dni', targetKey: 'dni' });
 
-Animal.hasMany(Cita, { foreignKey: 'animal_id' });
-Cita.belongsTo(Animal, { foreignKey: 'animal_id' });
-
-module.exports = { sequelize, Animal, Usuario, Cita };
+module.exports = db;
