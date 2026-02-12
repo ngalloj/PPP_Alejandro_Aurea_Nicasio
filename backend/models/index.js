@@ -10,7 +10,7 @@ const sequelize = new Sequelize('clinica_vet', 'postgres', 'admin1234', {
 // Modelos
 const Usuario = require('./usuario')(sequelize, DataTypes);
 const Animal = require('./animal')(sequelize, DataTypes);
-const Cita = require('./cita')(sequelize, DataTypes);
+const Cita = require('./cita/cita')(sequelize, DataTypes);
 
 // Asociaciones ACTUALIZADAS
 Usuario.hasMany(Animal, { foreignKey: 'usuario_dni', sourceKey: 'dni' });
