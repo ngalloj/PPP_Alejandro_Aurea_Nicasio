@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const supplierController = require('../controllers/supplierController');
-const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const { auth, roleAuth } = require('../middlewares/auth');
 
-router.get('/', verifyToken, supplierController.getAllSuppliers);
-router.get('/active', verifyToken, supplierController.getActiveSuppliers);
-router.get('/:id', verifyToken, supplierController.getSupplierById);
-router.post('/', verifyToken, checkRole(['administrador', 'recepcionista']), supplierController.createSupplier);
-router.put('/:id', verifyToken, checkRole(['administrador', 'recepcionista']), supplierController.updateSupplier);
-router.delete('/:id', verifyToken, checkRole(['administrador']), supplierController.deleteSupplier);
+router.get('/', auth, supplierController.getAllSuppliers);
+router.get('/active', auth, supplierController.getActiveSuppliers);
+router.get('/:id', auth, supplierController.getSupplierById);
+router.post('/', auth, roleAuth('admin', 'recepcionista'), supplierController.createSupplier);
+router.put('/:id', auth, roleAuth('admin', 'recepcionista'), supplierController.updateSupplier);
+router.delete('/:id', auth, roleAuth('admin'), supplierController.deleteSupplier);
 
 module.exports = router;

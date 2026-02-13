@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { Schedule, Employee } = require('../models');
-const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const { auth, roleAuth } = require('../middlewares/auth');
 
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const schedules = await Schedule.findAll({
       include: [{ model: Employee, as: 'employee', attributes: ['id', 'nombre', 'apellidos', 'puesto'] }]
@@ -14,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-router.get('/employee/:employeeId', verifyToken, async (req, res) => {
+router.get('/employee/:employeeId', auth, async (req, res) => {
   try {
     const schedules = await Schedule.findAll({
       where: { employeeId: req.params.employeeId },
@@ -26,7 +26,7 @@ router.get('/employee/:employeeId', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, checkRole(['administrador']), async (req, res) => {
+router.post('/', auth, roleAuth('admin'), async (req, res) => {
   try {
     const schedule = await Schedule.create(req.body);
     res.status(201).json(schedule);
@@ -35,7 +35,7 @@ router.post('/', verifyToken, checkRole(['administrador']), async (req, res) => 
   }
 });
 
-router.put('/:id', verifyToken, checkRole(['administrador']), async (req, res) => {
+router.put('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     const schedule = await Schedule.findByPk(req.params.id);
     if (!schedule) return res.status(404).json({ error: 'Horario no encontrado' });
@@ -46,7 +46,7 @@ router.put('/:id', verifyToken, checkRole(['administrador']), async (req, res) =
   }
 });
 
-router.delete('/:id', verifyToken, checkRole(['administrador']), async (req, res) => {
+router.delete('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     const schedule = await Schedule.findByPk(req.params.id);
     if (!schedule) return res.status(404).json({ error: 'Horario no encontrado' });

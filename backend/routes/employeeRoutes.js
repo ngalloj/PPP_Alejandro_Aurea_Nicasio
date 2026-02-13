@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const employeeController = require('../controllers/employeeController');
-const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const { auth, roleAuth } = require('../middlewares/auth');
 
-router.get('/', verifyToken, employeeController.getAllEmployees);
-router.get('/veterinarios', verifyToken, employeeController.getVeterinarios);
-router.get('/:id', verifyToken, employeeController.getEmployeeById);
-router.post('/', verifyToken, checkRole(['administrador']), employeeController.createEmployee);
-router.put('/:id', verifyToken, checkRole(['administrador']), employeeController.updateEmployee);
-router.delete('/:id', verifyToken, checkRole(['administrador']), employeeController.deleteEmployee);
+router.get('/', auth, employeeController.getAllEmployees);
+router.get('/veterinarios', auth, employeeController.getVeterinarios);
+router.get('/:id', auth, employeeController.getEmployeeById);
+router.post('/', auth, roleAuth('admin'), employeeController.createEmployee);
+router.put('/:id', auth, roleAuth('admin'), employeeController.updateEmployee);
+router.delete('/:id', auth, roleAuth('admin'), employeeController.deleteEmployee);
 
 module.exports = router;

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Discount } = require('../models');
-const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const { auth, roleAuth } = require('../middlewares/auth');
 const { Op } = require('sequelize');
 
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const discounts = await Discount.findAll({ order: [['createdAt', 'DESC']] });
     res.json(discounts);
@@ -13,7 +13,7 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-router.get('/active', verifyToken, async (req, res) => {
+router.get('/active', auth, async (req, res) => {
   try {
     const now = new Date();
     const discounts = await Discount.findAll({
@@ -29,7 +29,7 @@ router.get('/active', verifyToken, async (req, res) => {
   }
 });
 
-router.get('/validate/:codigo', verifyToken, async (req, res) => {
+router.get('/validate/:codigo', auth, async (req, res) => {
   try {
     const now = new Date();
     const discount = await Discount.findOne({
@@ -55,7 +55,7 @@ router.get('/validate/:codigo', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, checkRole(['administrador']), async (req, res) => {
+router.post('/', auth, roleAuth('admin'), async (req, res) => {
   try {
     const discount = await Discount.create(req.body);
     res.status(201).json(discount);
@@ -64,7 +64,7 @@ router.post('/', verifyToken, checkRole(['administrador']), async (req, res) => 
   }
 });
 
-router.put('/:id', verifyToken, checkRole(['administrador']), async (req, res) => {
+router.put('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     const discount = await Discount.findByPk(req.params.id);
     if (!discount) return res.status(404).json({ error: 'Descuento no encontrado' });
@@ -75,7 +75,7 @@ router.put('/:id', verifyToken, checkRole(['administrador']), async (req, res) =
   }
 });
 
-router.delete('/:id', verifyToken, checkRole(['administrador']), async (req, res) => {
+router.delete('/:id', auth, roleAuth('admin'), async (req, res) => {
   try {
     const discount = await Discount.findByPk(req.params.id);
     if (!discount) return res.status(404).json({ error: 'Descuento no encontrado' });

@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const treatmentController = require('../controllers/treatmentController');
-const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const { auth, roleAuth } = require('../middlewares/auth');
 
-router.get('/', verifyToken, treatmentController.getAllTreatments);
-router.get('/active', verifyToken, treatmentController.getActiveTreatments);
-router.get('/animal/:animalId', verifyToken, treatmentController.getTreatmentsByAnimal);
-router.get('/:id', verifyToken, treatmentController.getTreatmentById);
-router.post('/', verifyToken, checkRole(['veterinario', 'administrador']), treatmentController.createTreatment);
-router.put('/:id', verifyToken, checkRole(['veterinario', 'administrador']), treatmentController.updateTreatment);
-router.post('/:id/seguimiento', verifyToken, checkRole(['veterinario', 'administrador']), treatmentController.addSeguimiento);
-router.delete('/:id', verifyToken, checkRole(['veterinario', 'administrador']), treatmentController.deleteTreatment);
+router.get('/', auth, treatmentController.getAllTreatments);
+router.get('/active', auth, treatmentController.getActiveTreatments);
+router.get('/animal/:animalId', auth, treatmentController.getTreatmentsByAnimal);
+router.get('/:id', auth, treatmentController.getTreatmentById);
+router.post('/', auth, roleAuth('veterinario', 'admin'), treatmentController.createTreatment);
+router.put('/:id', auth, roleAuth('veterinario', 'admin'), treatmentController.updateTreatment);
+router.post('/:id/seguimiento', auth, roleAuth('veterinario', 'admin'), treatmentController.addSeguimiento);
+router.delete('/:id', auth, roleAuth('veterinario', 'admin'), treatmentController.deleteTreatment);
 
 module.exports = router;
