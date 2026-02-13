@@ -10,6 +10,8 @@ const usuarioRutas = require('./routes/usuario.routes');
 
 const app = express();
 
+
+
 console.log("=== INICIANDO APP ===");
 
 // Middlewares
@@ -40,6 +42,26 @@ app.use('/api/usuario', usuarioRutas);
 app.use('/api/recepcionista', require('./routes/recepcionista.routes'));
 app.use('/api/inventario', require('./routes/inventory.routes'));
 app.use('/api/facturas', require('./routes/factura.routes'));
+
+// Agregar estas líneas después de tus rutas existentes
+const employeeRoutes = require('./routes/employeeRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const reminderRoutes = require('./routes/reminderRoutes');
+const treatmentRoutes = require('./routes/treatmentRoutes');
+const supplierRoutes = require('./routes/supplierRoutes');
+const vaccineRoutes = require('./routes/vaccineRoutes');
+const scheduleRoutes = require('./routes/scheduleRoutes');
+const discountRoutes = require('./routes/discountRoutes');
+
+app.use('/api/employees', employeeRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/reminders', reminderRoutes);
+app.use('/api/treatments', treatmentRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/vaccines', vaccineRoutes);
+app.use('/api/schedules', scheduleRoutes);
+app.use('/api/discounts', discountRoutes);
+
 
 // Health check
 app.get('/health', (req, res) => {
