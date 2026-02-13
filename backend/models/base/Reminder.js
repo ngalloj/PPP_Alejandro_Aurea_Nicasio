@@ -3,8 +3,8 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Reminder = sequelize.define('Reminder', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    animalId: { type: DataTypes.INTEGER, references: { model: 'animals', key: 'id' }, allowNull: false },
-    usuarioId: { type: DataTypes.INTEGER, references: { model: 'usuarios', key: 'id' }, allowNull: false },
+    animalId: { type: DataTypes.INTEGER, allowNull: false },
+    usuarioId: { type: DataTypes.INTEGER, allowNull: false },
     tipo: { type: DataTypes.ENUM('vacuna', 'desparasitacion', 'revision', 'medicacion', 'cirugia_control', 'analisis', 'otro'), allowNull: false },
     titulo: { type: DataTypes.STRING(200), allowNull: false },
     descripcion: { type: DataTypes.TEXT },

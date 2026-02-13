@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Notification = sequelize.define('Notification', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    usuarioId: { type: DataTypes.INTEGER, references: { model: 'usuarios', key: 'id' }, allowNull: false },
+    usuarioId: { type: DataTypes.INTEGER, allowNull: false },
     tipo: { type: DataTypes.ENUM('cita_proxima', 'cita_confirmada', 'cita_cancelada', 'recordatorio_vacuna', 'resultado_analisis', 'factura_pendiente', 'mensaje_veterinario', 'stock_bajo', 'sistema'), allowNull: false },
     titulo: { type: DataTypes.STRING(200), allowNull: false },
     mensaje: { type: DataTypes.TEXT, allowNull: false },

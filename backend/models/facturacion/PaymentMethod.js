@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const PaymentMethod = sequelize.define('PaymentMethod', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    facturaId: { type: DataTypes.INTEGER, references: { model: 'facturas', key: 'id' }, allowNull: false },
+    facturaId: { type: DataTypes.INTEGER, allowNull: false },
     metodoPago: { type: DataTypes.ENUM('efectivo', 'tarjeta_credito', 'tarjeta_debito', 'transferencia', 'bizum', 'paypal', 'aplazado', 'seguro', 'otro'), allowNull: false },
     cantidad: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
     referenciaPago: { type: DataTypes.STRING(100) },

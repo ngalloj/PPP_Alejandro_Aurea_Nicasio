@@ -3,7 +3,7 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Schedule = sequelize.define('Schedule', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    employeeId: { type: DataTypes.INTEGER, references: { model: 'employees', key: 'id' }, allowNull: false },
+    employeeId: { type: DataTypes.INTEGER, allowNull: false },
     diaSemana: { type: DataTypes.ENUM('lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'), allowNull: false },
     horaInicio: { type: DataTypes.TIME, allowNull: false },
     horaFin: { type: DataTypes.TIME, allowNull: false },

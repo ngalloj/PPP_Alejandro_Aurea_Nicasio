@@ -3,9 +3,9 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Vaccine = sequelize.define('Vaccine', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    animalId: { type: DataTypes.INTEGER, references: { model: 'animals', key: 'id' }, allowNull: false },
-    historialId: { type: DataTypes.INTEGER, references: { model: 'historiales', key: 'id' } },
-    veterinarioId: { type: DataTypes.INTEGER, references: { model: 'employees', key: 'id' }, allowNull: false },
+    animalId: { type: DataTypes.INTEGER, allowNull: false },
+    historialId: { type: DataTypes.INTEGER },
+    veterinarioId: { type: DataTypes.INTEGER, allowNull: false },
     nombreVacuna: { type: DataTypes.STRING(200), allowNull: false },
     tipoVacuna: { type: DataTypes.ENUM('rabia', 'polivalente', 'moquillo', 'parvovirus', 'hepatitis', 'leptospirosis', 'leishmaniasis', 'tos_perrera', 'triple_felina', 'leucemia_felina', 'otro'), allowNull: false },
     fabricante: { type: DataTypes.STRING(150) },

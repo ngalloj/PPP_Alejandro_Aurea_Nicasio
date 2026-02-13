@@ -3,10 +3,10 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Treatment = sequelize.define('Treatment', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    historialId: { type: DataTypes.INTEGER, references: { model: 'historiales', key: 'id' } },
-    citaId: { type: DataTypes.INTEGER, references: { model: 'citas', key: 'id' } },
-    animalId: { type: DataTypes.INTEGER, references: { model: 'animals', key: 'id' }, allowNull: false },
-    veterinarioId: { type: DataTypes.INTEGER, references: { model: 'employees', key: 'id' }, allowNull: false },
+    historialId: { type: DataTypes.INTEGER },
+    citaId: { type: DataTypes.INTEGER },
+    animalId: { type: DataTypes.INTEGER, allowNull: false },
+    veterinarioId: { type: DataTypes.INTEGER, allowNull: false },
     tipo: { type: DataTypes.ENUM('medicacion', 'cirugia', 'terapia', 'rehabilitacion', 'hospitalizacion', 'otro'), allowNull: false },
     nombre: { type: DataTypes.STRING(200), allowNull: false },
     descripcion: { type: DataTypes.TEXT, allowNull: false },
