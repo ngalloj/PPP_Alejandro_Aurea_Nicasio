@@ -1,35 +1,37 @@
 // frontend/src/app/services/auth.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { User, AuthResponse, LoginRequest } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = "http://localhost:3000/api/usuario";
+  private baseUrl = 'http://localhost:3000/api/usuarios';
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<{ usuario: any, token: string }> {
-    return this.http.post<{ usuario: any, token: string }>(`${this.baseUrl}/login`, { email, password });
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, { email, password });
   }
 
-  saveToken(token: string): void { 
-    localStorage.setItem('token', token); 
+  saveToken(token: string): void {
+    localStorage.setItem('token', token);
   }
-  
-  getToken(): string | null { 
-    return localStorage.getItem('token'); 
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
-  
-  saveUsuario(usuario: any): void { 
-    localStorage.setItem('usuario', JSON.stringify(usuario)); 
+
+  saveUsuario(usuario: User): void {
+    localStorage.setItem('usuario', JSON.stringify(usuario));
   }
-  
-  getUsuario(): any {
+
+  getUsuario(): User | null {
     const u = localStorage.getItem('usuario');
     return u ? JSON.parse(u) : null;
   }
-  
+
   isLoggedIn(): boolean {
     const token = this.getToken();
     if (!token || token.split('.').length !== 3) return false;
@@ -40,18 +42,18 @@ export class AuthService {
         if (payload.exp < now) return false;
       }
       return true;
-    } catch { 
-      return false; 
+    } catch {
+      return false;
     }
   }
-  
+
   getUserFromToken(): any {
     const t = this.getToken();
     if (!t) return null;
-    try { 
-      return JSON.parse(atob(t.split('.')[1])); 
-    } catch { 
-      return null; 
+    try {
+      return JSON.parse(atob(t.split('.')[1]));
+    } catch {
+      return null;
     }
   }
 
@@ -59,7 +61,7 @@ export class AuthService {
   getRole(): string {
     const usuario = this.getUsuario();
     if (usuario && usuario.rol) return usuario.rol;
-    
+
     const tokenData = this.getUserFromToken();
     return tokenData?.rol || '';
   }
