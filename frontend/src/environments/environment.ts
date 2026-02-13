@@ -6,7 +6,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: '/api'  // En dev, gracias al proxy, funciona así
+  apiUrl: 'http://localhost:3000/api',
+  jwtSecret: 'tu_jwt_secret_super_seguro_2026_dg_mascotas' // ✅ MISMO QUE EN BACKEND
 };
 
 /*

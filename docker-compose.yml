@@ -1,58 +1,89 @@
-
+version: '3.8'
 
 services:
-  db:
-    image: postgres:15
-    container_name: pg-clinica
-    restart: always
+  # Base de datos PostgreSQL
+  dgmascotas-db:
+    image: postgres:15-alpine
+    container_name: dgmascotas-postgres
     environment:
-      POSTGRES_DB: clinica_vet
+      POSTGRES_DB: dgmascotas_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin1234
+      POSTGRES_PASSWORD: dgmascotas_pass_2026
+      TZ: Europe/Madrid
     ports:
       - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dgmascotas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # pgAdmin - Gestión DB
   pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin-clinica
-    restart: always
+    image: dpage/pgadmin4:latest
+    container_name: dgmascotas-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@clinica.com
-      PGADMIN_DEFAULT_PASSWORD: admin1234
+      PGADMIN_DEFAULT_EMAIL: admin@dgmascotas.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
-      - "8080:80"
+      - "5050:80"
     depends_on:
-      - db
+      - dgmascotas-db
+    networks:
+      - dgmascotas-network
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
 
-  # backend:
-#   build: ./backend
-#   container_name: backend-clinica
-#   restart: always
-#   environment:
-#     NODE_ENV: development
-#   ports:
-#     - "3000:3000"
-#   depends_on:
-#     - db
+  # Backend Node/Express
+  dgmascotas-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dgmascotas-api
+    environment:
+      DB_HOST: dgmascotas-db
+      DB_PORT: 5432
+      DB_NAME: dgmascotas_db
+      DB_USER: postgres
+      DB_PASSWORD: dgmascotas_pass_2026
+      PORT: 3000
+      NODE_ENV: development
+      JWT_SECRET: ${JWT_SECRET:-tu_jwt_secret_aqui}
+    ports:
+      - "3000:3000"
+    depends_on:
+      dgmascotas-db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - dgmascotas-network
+    command: npm run dev
 
-# frontend:
-#   build: ./frontend
-#   container_name: frontend-clinica
-#   restart: always
-#   environment:
-#     NODE_ENV: development
-#   ports:
-#     - "4200:80"
-#   depends_on:
-#     - backend
-
+  # Frontend Angular
+  dgmascotas-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dgmascotas-web
+    ports:
+      - "4200:80"
+    depends_on:
+      - dgmascotas-backend
+    networks:
+      - dgmascotas-network
+    environment:
+      ANGULAR_API_URL: http://localhost:3000
 
 volumes:
-  db-data:
-  pgadmin-data:
+  postgres_data:
+  pgadmin_data:
 
-# lo comentado es porque solo queremos levantar pg-clinica y pgadmin 
+networks:
+  dgmascotas-network:
+    driver: bridge
