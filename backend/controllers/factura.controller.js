@@ -16,7 +16,7 @@ const generarNumeroFactura = async () => {
 };
 
 // POST - Crear factura desde cita
-exports.crearDesdeC ita = async (req, res) => {
+exports.crearDesdeCita = async (req, res) => {
   try {
     const { citaId, items, metodoPago } = req.body;
     // items: [{inventoryId, cantidad, precio, nombre}]

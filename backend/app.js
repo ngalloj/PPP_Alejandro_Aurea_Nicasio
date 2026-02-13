@@ -36,10 +36,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api', rutas);
 app.use('/api/usuario', usuarioRutas);
 
+// Rutas de recepcionista, inventario y facturas
+app.use('/api/recepcionista', require('./routes/recepcionista.routes'));
+app.use('/api/inventario', require('./routes/inventory.routes'));
+app.use('/api/facturas', require('./routes/factura.routes'));
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
+
+
 
 // 404
 app.use((req, res) => {
@@ -75,10 +82,7 @@ sequelize.sync({ alter: true })
     process.exit(1);
   });
 
-  // Agregar DESPUÉS de las rutas actuales:
-//app.use('/api/recepcionista', require('./routes/recepcionista.routes'));
-//app.use('/api/inventario', require('./routes/inventario.routes'));
-//app.use('/api/facturas', require('./routes/factura.routes'));
+ 
 
 
 module.exports = app;
