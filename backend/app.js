@@ -36,7 +36,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas
 app.use('/api', rutas);
-app.use('/api/usuario', usuarioRutas);
+app.use('/api/usuarios', usuarioRutas);
 
 // Rutas de recepcionista, inventario y facturas
 app.use('/api/recepcionista', require('./routes/recepcionista.routes'));
