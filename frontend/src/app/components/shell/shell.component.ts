@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { AuthService } from '../../services/auth.service';
+import { BRANDING } from 'src/app/shared/sidenav/branding';
 
 
 @Component({
@@ -13,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./shell.component.scss'],
 })
 export class ShellComponent {
+  branding = BRANDING;
   user = this.auth.getUserFromToken();
 
   constructor(private auth: AuthService) {}

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from 'src/app/services/auth.service';
+import { BRANDING } from 'src/app/shared/sidenav/branding';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,7 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  branding = BRANDING;
   loginForm: FormGroup;
   loading = false;
   error: string | null = null;
