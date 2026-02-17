@@ -10,6 +10,9 @@ import {
   IonItem,
   IonLabel
 } from '@ionic/angular/standalone';
+import { IonicModule } from '@ionic/angular';
+
+
 // Si tienes UserService, importa aquí
 
 @Component({
@@ -25,7 +28,8 @@ import {
     IonToolbar,
     IonList,
     IonItem,
-    IonLabel
+    IonLabel,
+    IonicModule
   ]
 })
 export class UsersPage implements OnInit {

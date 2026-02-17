@@ -1,28 +1,34 @@
 <!-- frontend/src/app/pages/login/login.component.html -->
-<h2>Iniciar sesión</h2>
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  <mat-card>
-    <mat-card-title>Login</mat-card-title>
-    <mat-card-content>
+<div class="auth-bg">
+  <div class="auth-card">
+    <div class="brand">
+      <div class="logo-dot"></div>
       <div>
-        <label>Email</label>
-        <input matInput formControlName="email" placeholder="correo@ejemplo.com" type="email">
-        <div *ngIf="emailField?.invalid && emailField?.touched" class="error-msg">
-          Introduce un email válido.
-        </div>
+        <div class="title">DG Mascotas</div>
+        <div class="subtitle">Acceso al sistema</div>
       </div>
-      <div>
-        <label>Contraseña</label>
-        <input matInput formControlName="password" placeholder="Contraseña" type="password">
-        <div *ngIf="passwordField?.invalid && passwordField?.touched" class="error-msg">
-          Campo obligatorio.
-        </div>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <label>Email</label>
+      <input type="email" formControlName="email" placeholder="tu@email.com" />
+
+      <div class="error" *ngIf="emailField?.touched && emailField?.invalid">
+        Introduce un email válido.
       </div>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" type="submit" [disabled]="loading">Entrar</button>
-      <span *ngIf="loading" class="spinner">Cargando...</span>
-      <span *ngIf="error" class="error-msg">{{ error }}</span>
-    </mat-card-actions>
-  </mat-card>
-</form>
+
+      <label>Contraseña</label>
+      <input type="password" formControlName="password" placeholder="••••••••" />
+
+      <div class="error" *ngIf="passwordField?.touched && passwordField?.invalid">
+        Campo obligatorio.
+      </div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Cargando…' : 'Entrar' }}
+      </button>
+
+      <div class="error server" *ngIf="error">{{ error }}</div>
+    </form>
+  </div>
+</div>

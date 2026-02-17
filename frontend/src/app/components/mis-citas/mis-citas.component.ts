@@ -9,6 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { CitaService } from '../../services/cita.service';
 import { AuthService } from '../../services/auth.service';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import { MatList } from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
+
+
 
 interface Cita {
   id: number;
@@ -31,7 +37,11 @@ interface Cita {
     MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatListModule,
+    MatList
   ],
   templateUrl: './mis-citas.component.html',
   styleUrls: ['./mis-citas.component.css']

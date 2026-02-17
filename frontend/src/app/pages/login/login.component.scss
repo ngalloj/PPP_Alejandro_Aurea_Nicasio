@@ -1,1 +1,61 @@
 // frontend/src/app/pages/login/login.component.scss
+.auth-bg {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: radial-gradient(1000px 600px at 20% 10%, rgba(56,128,255,.25), transparent 60%),
+                radial-gradient(900px 500px at 80% 90%, rgba(45,211,111,.18), transparent 55%),
+                #0b1220;
+  }
+  
+  .auth-card {
+    width: min(420px, 100%);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    padding: 22px;
+    color: #fff;
+    backdrop-filter: blur(10px);
+  }
+  
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .logo-dot {
+    width: 14px; height: 14px; border-radius: 999px;
+    background: #3880ff;
+  }
+  .title { font-size: 18px; font-weight: 800; }
+  .subtitle { opacity: .75; font-size: 13px; }
+  
+  label { display:block; margin-top: 12px; margin-bottom: 6px; opacity: .85; }
+  
+  input {
+    width: 100%;
+    padding: 12px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(0,0,0,.25);
+    color: #fff;
+    outline: none;
+  }
+  
+  button {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 0;
+    background: #3880ff;
+    color: white;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  
+  .error { margin-top: 8px; color: #ffb4b4; font-size: 12px; }
+  .error.server { margin-top: 12px; }
+  

@@ -14,6 +14,9 @@ import {
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';  // Ajusta la ruta según tu estructura
+import { IonicModule } from '@ionic/angular';
+
+
 
 @Component({
   selector: 'app-register',
@@ -30,7 +33,8 @@ import { UserService } from '../services/user.service';  // Ajusta la ruta segú
     IonItem,
     IonLabel,
     IonInput,
-    IonButton
+    IonButton,
+    IonicModule
   ]
 })
 export class RegisterPage {

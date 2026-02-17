@@ -5,18 +5,21 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { IonicModule } from '@ionic/angular';
 
 imports: [
   CommonModule,  // ← AGREGAR ESTO
   MatButtonModule,
   MatIconModule,
-  MatCardModule
+  MatCardModule,
+  IonicModule
 ]
 
 
 @Component({
   selector: 'app-upload-foto',
   standalone: true, // <- Debe terner esto
+  imports: [CommonModule, IonicModule],
   templateUrl: './upload-foto.component.html',
   styleUrls: ['./upload-foto.component.css']
 })

@@ -7,6 +7,11 @@ import { MatListModule } from '@angular/material/list';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
+
 
 @Component({
   selector: 'app-sidenav',
@@ -17,7 +22,10 @@ import { AuthService } from '../../services/auth.service';
     MatIconModule,
     MatListModule,
     CommonModule,
-    RouterModule
+    RouterModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
   ],
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.css']

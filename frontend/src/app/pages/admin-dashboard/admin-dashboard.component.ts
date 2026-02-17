@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -13,7 +14,8 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,           // ✅ AÑADIDO para *ngIf y pipes
     MatCardModule, 
     MatButtonModule, 
-    RouterModule
+    RouterModule,
+    IonicModule
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css'],

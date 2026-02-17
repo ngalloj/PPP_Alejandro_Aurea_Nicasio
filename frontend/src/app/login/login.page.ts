@@ -14,6 +14,9 @@ import {
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service'; // IMPORTANTE
+import { IonicModule } from '@ionic/angular';
+
+
 
 
 @Component({
@@ -31,7 +34,8 @@ import { AuthService } from '../services/auth.service'; // IMPORTANTE
     IonItem,
     IonLabel,
     IonInput,
-    IonButton
+    IonButton,
+    IonicModule
   ]
 })
 export class LoginPage {
