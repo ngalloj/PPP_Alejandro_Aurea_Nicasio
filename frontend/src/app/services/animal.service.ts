@@ -1,35 +1,96 @@
-// frontend/src/app/services/animal.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
+export type SexoAnimal = 'M' | 'H';
+
+export interface Animal {
+  idAnimal: number;
+  nombre: string;
+  especie: string;
+  raza: string | null;
+  Fechanac: string | null;      // DATEONLY -> "YYYY-MM-DD"
+  sexo: SexoAnimal | null;
+  observaciones: string | null;
+  foto: string | null;
+  idUsuario: number;
+}
+
+/**
+ * Payload para CREAR animal (POST /api/animal)
+ * Controller exige nombre e idUsuario.
+ * Modelo exige especie (allowNull: false) => también obligatorio.
+ */
+export interface CreateAnimalDto {
+  nombre: string;
+  especie: string;
+  idUsuario: number;
+
+  raza?: string | null;
+  Fechanac?: string | null; // "YYYY-MM-DD"
+  sexo?: SexoAnimal | null;
+  observaciones?: string | null;
+  foto?: string | null;
+}
+
+/**
+ * Payload para ACTUALIZAR animal (PUT /api/animal/:id)
+ * Puede venir parcial.
+ */
+export interface UpdateAnimalDto {
+  nombre?: string;
+  especie?: string;
+  idUsuario?: number;
+
+  raza?: string | null;
+  Fechanac?: string | null;
+  sexo?: SexoAnimal | null;
+  observaciones?: string | null;
+  foto?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnimalService {
-  private apiUrl = 'http://localhost:3000/api/animal';
+  private apiUrl = 'http://localhost:8080/api/animal';
 
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      Authorization: `Bearer ${this.auth.getToken()}`
+  /** GET /api/animal */
+  getAnimales(): Observable<Animal[]> {
+    return this.http.get<Animal[]>(this.apiUrl, {
+      headers: this.authService.authHeaders(),
     });
   }
 
-  getAnimales(page = 1, limit = 10): Observable<any> {
-    return this.http.get(`${this.apiUrl}?page=${page}&limit=${limit}`, { headers: this.getHeaders() });
+  /** GET /api/animal/:id */
+  getAnimalById(idAnimal: number): Observable<Animal> {
+    return this.http.get<Animal>(`${this.apiUrl}/${idAnimal}`, {
+      headers: this.authService.authHeaders(),
+    });
   }
 
-  getMisAnimales(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/mios`, { headers: this.getHeaders() });
+  /** POST /api/animal */
+  createAnimal(payload: CreateAnimalDto): Observable<Animal> {
+    return this.http.post<Animal>(this.apiUrl, payload, {
+      headers: this.authService.authHeaders(),
+    });
   }
 
-  crearAnimal(datos: any) {
-    return this.http.post(this.apiUrl, datos, { headers: this.getHeaders() });
+  /** PUT /api/animal/:id */
+  updateAnimal(idAnimal: number, payload: UpdateAnimalDto): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${idAnimal}`, payload, {
+      headers: this.authService.authHeaders(),
+    });
   }
-  
 
-  modificarAnimal(animalId: string, datos: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${animalId}`, datos, { headers: this.getHeaders() });
+  /** DELETE /api/animal/:id */
+  deleteAnimal(idAnimal: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${idAnimal}`, {
+      headers: this.authService.authHeaders(),
+    });
   }
 }

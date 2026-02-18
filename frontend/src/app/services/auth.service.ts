@@ -1,114 +1,64 @@
-// frontend/src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable} from 'rxjs';
+
+export interface LoginResponse {
+  usuario: {
+    idUsuario?: number;
+    email?: string;
+    rol?: string;
+    nombre?: string;
+  };
+  access_token: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = "http://localhost:3000/api/usuario";
+  // Ajusta host/puerto a tu backend real
+  private apiUrl = 'http://localhost:8080/api/usuario';
+
+  private tokenKey = 'access_token';
+  private userKey = 'usuario';
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<{ usuario: any, token: string }> {
-    return this.http.post<{ usuario: any, token: string }>(`${this.baseUrl}/login`, { email, password });
+  login(email: string, password: string): Observable<LoginResponse> {
+    // el backend espera "contrasena"
+    const body = { email, contrasena: password };
+    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
   }
 
-  saveToken(token: string): void { 
-    localStorage.setItem('token', token); 
+  saveSession(resp: LoginResponse) {
+    localStorage.setItem(this.tokenKey, resp.access_token);
+    localStorage.setItem(this.userKey, JSON.stringify(resp.usuario));
   }
-  
-  getToken(): string | null { 
-    return localStorage.getItem('token'); 
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
   }
-  
-  saveUsuario(usuario: any): void { 
-    localStorage.setItem('usuario', JSON.stringify(usuario)); 
+
+  getUser(): any | null {
+    const raw = localStorage.getItem(this.userKey);
+    return raw ? JSON.parse(raw) : null;
   }
-  
-  getUsuario(): any {
-    const u = localStorage.getItem('usuario');
-    return u ? JSON.parse(u) : null;
+
+  getUserRole(): string | null {
+    return this.getUser()?.rol ?? null;
   }
-  
-  isLoggedIn(): boolean {
+
+  logout() {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
+  }
+
+  // Para endpoints protegidos: añade Authorization: Bearer <token>
+  authHeaders(): HttpHeaders {
     const token = this.getToken();
-    if (!token || token.split('.').length !== 3) return false;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.exp) {
-        const now = Math.floor(Date.now() / 1000);
-        if (payload.exp < now) return false;
-      }
-      return true;
-    } catch { 
-      return false; 
-    }
-  }
-  
-  getUserFromToken(): any {
-    const t = this.getToken();
-    if (!t) return null;
-    try { 
-      return JSON.parse(atob(t.split('.')[1])); 
-    } catch { 
-      return null; 
-    }
+    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  // ✅ MÉTODO PRINCIPAL
-  getRole(): string {
-    const usuario = this.getUsuario();
-    if (usuario && usuario.rol) return usuario.rol;
-    
-    const tokenData = this.getUserFromToken();
-    return tokenData?.rol || '';
-  }
-
-  // ✅ ALIAS (para compatibilidad)
-  getUserRole(): string {
-    return this.getRole();
-  }
-
-  // ✅ MÉTODOS DE VERIFICACIÓN
-  isAdmin(): boolean {
-    return this.getRole() === 'admin';
-  }
-
-  isVeterinario(): boolean {
-    return this.getRole() === 'veterinario';
-  }
-
-  isRecepcionista(): boolean {
-    return this.getRole() === 'recepcionista';
-  }
-
-  isCliente(): boolean {
-    return this.getRole() === 'cliente';
-  }
-
-  // ✅ PERMISOS COMPUESTOS
-  canModifyUsers(): boolean {
-    const rol = this.getRole();
-    return rol === 'admin' || rol === 'veterinario';
-  }
-
-  canDeleteUsers(): boolean {
-    const rol = this.getRole();
-    return rol === 'admin' || rol === 'veterinario';
-  }
-
-  canCreateUsers(): boolean {
-    const rol = this.getRole();
-    return rol === 'admin' || rol === 'veterinario' || rol === 'recepcionista';
-  }
-
-  canAccessFullCRUD(): boolean {
-    const rol = this.getRole();
-    return rol === 'admin' || rol === 'veterinario' || rol === 'recepcionista';
-  }
-
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
+  // Ejemplo: pedir usuarios (ruta protegida)
+  getUsuarios() {
+    return this.http.get(`${this.apiUrl}`, { headers: this.authHeaders() });
   }
 }

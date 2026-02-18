@@ -1,4 +1,3 @@
-// frontend/.eslintrc.json
 {
   "root": true,
   "ignorePatterns": ["projects/**/*"],
@@ -14,6 +13,7 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "@angular-eslint/prefer-standalone": "off",
         "@angular-eslint/component-class-suffix": [
           "error",
           {

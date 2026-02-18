@@ -1,38 +1,22 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "API y lógica del backend para la clínica veterinaria.",
-  "main": "index.js",
+  "description": "",
+  "license": "ISC",
+  "author": "",
   "type": "commonjs",
+  "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "test": "jest",
-    "test:api": "jest --runInBand tests/api"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.15.3",
-    "pg": "^8.16.3",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7",
-    "sequelize-cli": "^6.6.3"
-  },
-  "devDependencies": {
-    "jest": "^30.2.0",
-    "nodemon": "^3.1.11",
-    "supertest": "^7.1.4"
-  },
-  "keywords": [
-    "node",
-    "express",
-    "backend",
-    "api",
-    "clinica-veterinaria"
-  ],
-  "author": "",
-  "license": "ISC"
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "mysql2": "^3.16.1",
+    "sequelize": "^6.37.7"
+  }
 }

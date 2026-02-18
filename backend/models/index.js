@@ -1,27 +1,64 @@
-// backend/models/index.js
 'use strict';
 
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('clinica_vet', 'postgres', 'admin1234', {
-  host: 'localhost', //host: 'pg-clinica' -> el nombre del servicio en docker-compose host: 'localhost' -> en local 
-  dialect: 'postgres'
+// Configuración BD
+const dbConfig = require("../config/db.config.js");
+const Sequelize = require("sequelize");
+
+// Instancia Sequelize
+const sequelize = new Sequelize(
+  dbConfig.DB,
+  dbConfig.USER,
+  dbConfig.PASSWORD,
+  {
+    host: dbConfig.HOST,
+    dialect: dbConfig.dialect,
+    logging: false,
+    pool: {
+      max: dbConfig.pool.max,
+      min: dbConfig.pool.min,
+      acquire: dbConfig.pool.acquire,
+      idle: dbConfig.pool.idle
+    }
+  }
+);
+
+// Contenedor de modelos
+const db = {};
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+
+// CARGA DE MODELOS
+
+// Base
+db.Usuario = require("./base/usuario.js")(sequelize, Sequelize);
+
+// Animales
+db.Animal = require("./animales/animal.js")(sequelize, Sequelize);
+
+// Historial
+db.Historial = require("./historiales/historial.js")(sequelize, Sequelize);
+db.LineaHistorial = require("./historiales/lineaHistorial.js")(sequelize, Sequelize);
+
+// Citas
+db.Cita = require("./citas/cita.js")(sequelize, Sequelize);
+
+// Catálogo
+db.Elemento = require("./catalogo/elemento.js")(sequelize, Sequelize);
+db.Producto = require("./catalogo/producto.js")(sequelize, Sequelize);
+db.Servicio = require("./catalogo/Servicio.js")(sequelize, Sequelize);
+
+// Facturación
+db.Factura = require("./facturacion/factura.js")(sequelize, Sequelize);
+db.LineaFactura = require("./facturacion/lineaFactura.js")(sequelize, Sequelize);
+
+
+// EJECUCIÓN DE ASOCIACIONES
+
+Object.keys(db).forEach(modelName => {
+  if (db[modelName] && typeof db[modelName].associate === "function") {
+    db[modelName].associate(db);
+  }
 });
 
-// Modelos
-const Usuario = require('./usuario')(sequelize, DataTypes);
-const Animal = require('./animal')(sequelize, DataTypes);
-const Cita = require('./cita')(sequelize, DataTypes);
-
-// Asociaciones (relaciones)
-Usuario.hasMany(Animal, { foreignKey: 'usuario_id' });
-Animal.belongsTo(Usuario, { foreignKey: 'usuario_id' });
-
-Usuario.hasMany(Cita, { foreignKey: 'usuario_id' });
-Cita.belongsTo(Usuario, { foreignKey: 'usuario_id' });
-
-// Si quieres relación cita-animal (un animal puede tener varias citas)
-Animal.hasMany(Cita, { foreignKey: 'animal_id' });
-Cita.belongsTo(Animal, { foreignKey: 'animal_id' });
-
-// Exporta los modelos y la conexión
-module.exports = { sequelize, Animal, Usuario, Cita };
+module.exports = db;
