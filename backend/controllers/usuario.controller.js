@@ -1,115 +1,154 @@
-// backend/controllers/usuario.controllers.js
-const { Usuario, Animal } = require('../models');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const SECRET = 'admin1234';
+// importas el modelo y creas un objeto
+const db = require("../models");
+const User = db.usuario;
 
-// Login (NO CAMBIAR - ya está bien)
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const usuario = await Usuario.findOne({ where: { email } });
-    if (!usuario)
-      return res.status(401).json({ error: 'Credenciales inválidas (usuario)' });
 
-    const passwordCorrecta = await bcrypt.compare(password, usuario.password);
-    console.log(`¿Password coincide para ${email}? => ${passwordCorrecta}`);
-    if (!passwordCorrecta)
-      return res.status(401).json({ error: 'Credenciales inválidas (password)' });
+//importa bcrypt para gestionar tokens 
+const  bcrypt  =  require('bcryptjs');
 
-    const { id, email: userEmail, rol, dni } = usuario.get();
-    const token = jwt.sign({ id, email: userEmail, rol, dni }, SECRET, { expiresIn: '4h' });
-    return res.json({
-      mensaje: 'Login correcto',
-      usuario: { id, email: userEmail, rol, dni },
-      token
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Error del servidor: ' + err.message });
-  }
-};
 
-// Listar todos (NO CAMBIAR - ya está bien)
-exports.getAll = async (req, res) => {
-  try {
-    const usuarios = await Usuario.findAll({ include: [{ model: Animal }] });
-    res.json(usuarios.map(u => {
-      const { id, email, rol, dni, Animales } = u.get({ plain: true });
-      return { id, email, rol, dni, animales: Animales };
-    }));
-  } catch (err) { res.status(500).json({ error: err.message }); }
-};
+//crea un nuevo usuario
 
-// Obtener por ID (NO CAMBIAR - ya está bien)
-exports.getById = async (req, res) => {
-  try {
-    const usuario = await Usuario.findByPk(req.params.id, { include: [{ model: Animal }] });
-    if (!usuario)
-      return res.status(404).json({ error: 'No encontrado' });
-    const { id, email, rol, dni, Animales } = usuario.get({ plain: true });
-    res.json({ id, email, rol, dni, animales: Animales });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-};
-
-// ✅ CREAR - AÑADIR VALIDACIÓN DE CLIENTE
 exports.create = async (req, res) => {
   try {
-    const rolSolicitante = req.usuario?.rol || 'admin';
-    let { password, rol, ...resto } = req.body;
-    
-    if (!resto.dni) 
-      return res.status(400).json({ error: 'Falta dni' });
-
-    // ✅ NUEVO: Cliente NO puede crear usuarios
-    if (rolSolicitante === 'cliente') {
-      return res.status(403).json({ error: 'Cliente no autorizado para crear usuarios.' });
+    if (!req.body.contrasena || !req.body.email) {
+      return res.status(400).send({ message: "No puede estar vacío" });
     }
 
-    // ✅ YA EXISTÍA: Recepcionista solo puede crear clientes
-    if (rolSolicitante === 'recepcionista' && rol !== 'cliente') {
-      return res.status(403).json({ error: 'Recepcionista sólo puede crear clientes.' });
-    }
-    
-    if (!rol) rol = 'cliente';
+    const user = {
+      nombre: req.body.nombre,
+      email: req.body.email,
+      rol:req.body.rol
+     // filename: req.file ? req.file.filename : ""
+    };
 
-    if (password) password = await bcrypt.hash(password, 10);
-    const usuario = await Usuario.create({ ...resto, password, rol });
-    const { id, email, dni: dniCreado } = usuario.get();
-    res.status(201).json({ id, email, rol, dni: dniCreado });
+    // hash seguro (10 salt rounds)
+    user.contrasena = await bcrypt.hash(String(req.body.contrasena), 10);
+
+    const data = await User.create(user);
+    return res.send(data);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(500).send({
+      message: err.message || "El usuario no se ha creado correctamente."
+    });
   }
 };
 
-// ✅ ACTUALIZAR - AÑADIR VALIDACIÓN
+
+// Muestra todos los usuarios
+
+exports.findAll = (req, res) => {
+  User.findAll()
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Ha ocurrido un error y no es posible mostrar los usuarios"
+      });
+    });
+};
+
+// localiza a un usuario por su ID y lo devuelve
+
+exports.findOne = (req, res) => {
+  const idUsuario = req.params.id;
+
+  User.findByPk(idUsuario)
+    .then(data => {
+      if (data) {
+        res.send(data);
+      } else {
+        res.status(404).send({
+          message: `No se ha podido localizar el usuario con  id=${idUsuario} .`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error al obtner el usuario con id= " + idUsuario
+      });
+    });
+
+};
+
+
+// actualiza a un usuario identificado por su id
+
 exports.update = async (req, res) => {
   try {
-    const rolSolicitante = req.usuario?.rol;
-    
-    // ✅ NUEVO: Solo admin y veterinario pueden modificar
-    if (rolSolicitante !== 'admin' && rolSolicitante !== 'veterinario') {
-      return res.status(403).json({ error: 'Solo admin y veterinario pueden modificar usuarios.' });
+    const idUsuario = req.params.id;
+    /* const removeImage =
+      req.body.removeImage === true ||
+      req.body.removeImage === 'true' ||
+      req.body.removeImage === '1' ||
+      req.body.removeImage === 1;*/
+
+    const data = {
+      nombre: req.body.nombre,
+      email: req.body.email,
+      rol:req.body.rol
+    };
+
+
+    // Si viene password se hashea 
+    if (req.body.contrasena) {
+      data.contrasena = await bcrypt.hash(String(req.body.contrasena), 10);
+
     }
 
-    let datos = { ...req.body };
-    if (datos.password)
-      datos.password = await bcrypt.hash(datos.password, 10);
-    const [actualizado] = await Usuario.update(datos, { where: { id: req.params.id } });
-    res.json({ actualizado });
-  } catch (err) { res.status(400).json({ error: err.message }); }
-};
-
-// ✅ ELIMINAR - AÑADIR VALIDACIÓN
-exports.delete = async (req, res) => {
-  try {
-    const rolSolicitante = req.usuario?.rol;
-    
-    // ✅ NUEVO: Solo admin y veterinario pueden eliminar
-    if (rolSolicitante !== 'admin' && rolSolicitante !== 'veterinario') {
-      return res.status(403).json({ error: 'Solo admin y veterinario pueden eliminar usuarios.' });
+    /*if (req.file) {
+      data.filename = req.file.filename;
     }
 
-    await Usuario.destroy({ where: { id: req.params.id } });
-    res.json({ eliminado: true });
-  } catch (err) { res.status(400).json({ error: err.message }); }
+    if (removeImage){
+      data.filename=null;
+    }*/
+
+    const num = await User.update(data, { where: { idUsuario } });
+
+    if (num == 1) {
+      return res.send({
+        message: "El usuario se ha actualizado correctamente"
+
+        
+      });
+    }
+
+    return res.send({
+      message: `No ha sido posible actualizar el usuario con id=${idUsuario}.`
+    });
+
+  } catch (err) {
+    return res.status(500).send({
+      message: "Error actualizando el usuario con id=" + idUsuario
+    });
+  }
 };
+// Borra un usuario concreto identificado por su id . 
+exports.delete = (req, res) => {
+  const idUsuario = req.params.id;
+
+  User.destroy({
+    where: { idUsuario: idUsuario }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "El usuario se ha eliminado correctamente!"
+        });
+      } else {
+        res.send({
+          message: `No ha sido posible eliminar el usuario con id=${idUsuario}. Es posible que no se encuentre!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "No ha sido posible eliminar el usuario con id=" + idUsuario
+      });
+    });
+};
+
+

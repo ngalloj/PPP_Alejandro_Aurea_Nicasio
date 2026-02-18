@@ -1,17 +1,13 @@
-// backend/routes/animal.routes.js
-const express = require('express');
-const router = express.Router();
-const animalController = require('../controllers/animal.controller');
-const { auth, allowRoles } = require('../middlewares/auth');
-const { validarCampos, validarAnimal } = require('../middlewares/validators');
+module.exports = (app) => {
+  const animal = require("../controllers/animal.controller.js");
+  const auth = require("../controllers/auth.js");
+  const router = require("express").Router();
 
-// Rutas públicas
-router.get('/', ctrl.getAll);
-router.get('/:id', ctrl.getById);
+  router.post("/", auth.isAuthenticated, animal.create);
+  router.get("/", auth.isAuthenticated, animal.findAll);
+  router.get("/:id", auth.isAuthenticated, animal.findOne);
+  router.put("/:id", auth.isAuthenticated, animal.update);
+  router.delete("/:id", auth.isAuthenticated, animal.delete);
 
-// Rutas protegidas (requieren login/JWT)
-router.post('/', auth, validarAnimal, validarCampos, animalController.create);
-router.put('/:id', auth, validarAnimal, validarCampos, animalController.update);
-router.delete('/:id', auth, allowRoles(['admin', 'recepcionista']), animalController.delete);
-
-module.exports = router;
+  app.use("/api/animal", router);
+};

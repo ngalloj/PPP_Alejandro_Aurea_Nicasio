@@ -1,40 +1,56 @@
-// backend/controllers/cita.controller.js
-const { Cita, Animal, Usuario } = require('../models');
+const db = require("../models");
+const Cita = db.cita;
 
-// Listar todas las citas (con animal y usuario)
-exports.getAll = async (req, res) => {
-  const citas = await Cita.findAll({ include: [Animal, Usuario] });
-  res.json(citas);
-};
-
-// Buscar cita por ID (con animal y usuario)
-exports.getById = async (req, res) => {
-  const cita = await Cita.findByPk(req.params.id, { include: [Animal, Usuario] });
-  if (cita) res.json(cita);
-  else res.status(404).json({ error: 'No encontrada' });
-};
-
-// Crear cita (requiere animal_id y usuario_id)
 exports.create = async (req, res) => {
   try {
-    if (!req.body.fecha) throw new Error('Falta fecha');
-    if (!req.body.animal_id) throw new Error('Falta animal_id');
-    if (!req.body.usuario_id) throw new Error('Falta usuario_id');
-    const cita = await Cita.create(req.body);
-    res.status(201).json(cita);
+    if (!req.body.fechaHora || !req.body.tipo || !req.body.idAnimal || !req.body.idServicio) {
+      return res.status(400).send({ message: "fechaHora, tipo, idAnimal e idServicio son obligatorios." });
+    }
+    const data = await Cita.create(req.body);
+    return res.send(data);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(500).send({ message: err.message || "Error creando Cita." });
   }
 };
 
-// Actualizar cita
-exports.update = async (req, res) => {
-  await Cita.update(req.body, { where: { id: req.params.id } });
-  res.json({ actualizado: true });
+exports.findAll = async (req, res) => {
+  try {
+    const data = await Cita.findAll();
+    return res.send(data);
+  } catch (err) {
+    return res.status(500).send({ message: err.message || "Error listando Citas." });
+  }
 };
 
-// Eliminar cita
+exports.findOne = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await Cita.findByPk(id);
+    if (!data) return res.status(404).send({ message: `Cita no encontrada id=${id}` });
+    return res.send(data);
+  } catch (err) {
+    return res.status(500).send({ message: err.message || "Error obteniendo Cita." });
+  }
+};
+
+exports.update = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const [num] = await Cita.update(req.body, { where: { idCita: id } });
+    if (num === 1) return res.send({ message: "Cita actualizada correctamente." });
+    return res.send({ message: `No ha sido posible actualizar Cita id=${id}.` });
+  } catch (err) {
+    return res.status(500).send({ message: "Error actualizando Cita id=" + req.params.id });
+  }
+};
+
 exports.delete = async (req, res) => {
-  await Cita.destroy({ where: { id: req.params.id } });
-  res.json({ eliminado: true });
+  try {
+    const id = req.params.id;
+    const num = await Cita.destroy({ where: { idCita: id } });
+    if (num === 1) return res.send({ message: "Cita eliminada correctamente." });
+    return res.send({ message: `No ha sido posible eliminar Cita id=${id}.` });
+  } catch (err) {
+    return res.status(500).send({ message: "Error eliminando Cita id=" + req.params.id });
+  }
 };

@@ -1,17 +1,13 @@
-// backend/routes/cita.routes.js
-const express = require('express');
-const router = express.Router();
-const citaController = require('../controllers/cita.controller');
-const { auth, allowRoles } = require('../middlewares/auth');
-const { validarCampos, validarCita } = require('../middlewares/validators');
+module.exports = (app) => {
+  const cita = require("../controllers/cita.controller.js");
+  const auth = require("../controllers/auth.js");
+  const router = require("express").Router();
 
-// Rutas públicas
-router.get('/', auth, citaController.getAll);
-router.get('/:id', auth, citaController.getById);
+  router.post("/", auth.isAuthenticated, cita.create);
+  router.get("/", auth.isAuthenticated, cita.findAll);
+  router.get("/:id", auth.isAuthenticated, cita.findOne);
+  router.put("/:id", auth.isAuthenticated, cita.update);
+  router.delete("/:id", auth.isAuthenticated, cita.delete);
 
-// Rutas protegidas (requieren login/JWT)
-router.post('/', auth, validarCita, validarCampos, citaController.create);
-router.put('/:id', auth, validarCita, validarCampos, citaController.update);
-router.delete('/:id', auth, allowRoles(['admin', 'recepcionista']), citaController.delete);
-
-module.exports = router;
+  app.use("/api/cita", router);
+};
