@@ -19,14 +19,14 @@ Prerequisites, to have installed:
 - SO Windows
 - Node.js 
 - npm
-- DockerDesktop
+- XAMPP
+- MySQLWorkbench
 - VSC
-- pgAdmin
 
 Structure: 
 - /backend - API Node/Express (Sequelize)
 - /frontend - Ionic/Angular
-- docker-compose.yml - database services (currently Postgres) and pgAdmin
+- database services (currently MySQLWorkbench) and XAMPP
 - scripts in the root package.json to start and install subtasks
 
 Quick installation (local development):
