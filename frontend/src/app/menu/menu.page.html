@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Menú</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button class="logout-btn" (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Salir
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+
+    <!-- Tarjeta de bienvenida -->
+    <ion-card class="welcome-card" *ngIf="role">
+      <ion-card-header>
+        <div class="welcome-header">
+          <div class="badge-icon">
+            <ion-icon name="paw"></ion-icon>
+          </div>
+
+          <div>
+            <div class="welcome-title">Bienvenido/a</div>
+            <div class="welcome-subtitle" *ngIf="userEmail">{{ userEmail }}</div>
+          </div>
+        </div>
+
+        <div class="role-chip">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          Acceso: {{ roleLabel }}
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="welcome-note(ion-text-wrap)">
+          Selecciona una opción para continuar con la gestión de la clínica.
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Estado sin sesión -->
+    <ion-item class="state-item" color="warning" *ngIf="!role">
+      <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
+      <ion-label class="ion-text-wrap">
+        No se ha detectado sesión válida. Volviendo a login…
+      </ion-label>
+    </ion-item>
+
+    <!-- Título de sección -->
+    <div class="section-title" *ngIf="menuItems.length > 0">
+      <span>Opciones</span>
+      <span class="section-hint">Toca para abrir</span>
+    </div>
+
+    <!-- Menú -->
+    <ion-list class="menu-list" *ngIf="menuItems.length > 0">
+      <ion-item
+        class="menu-item"
+        button
+        detail="true"
+        *ngFor="let item of menuItems"
+        (click)="goTo(item)"
+      >
+        <div class="menu-icon-wrap" slot="start">
+          <ion-icon [name]="item.icon"></ion-icon>
+        </div>
+
+        <ion-label class="ion-text-wrap">
+          <h2>{{ item.title }}</h2>
+          <p *ngIf="item.description">{{ item.description }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Estado sin opciones -->
+    <ion-item class="state-item" *ngIf="role && menuItems.length === 0" color="light">
+      <ion-icon name="information-circle-outline" slot="start"></ion-icon>
+      <ion-label class="ion-text-wrap">
+        No hay opciones configuradas para tu rol.
+      </ion-label>
+    </ion-item>
+
+  </div>
+</ion-content>
