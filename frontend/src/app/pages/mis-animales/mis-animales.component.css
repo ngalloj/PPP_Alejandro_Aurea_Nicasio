@@ -1,0 +1,9 @@
+/* frontend/src/app/pages/mis-animales/mis-animales.component.css */
+table {
+    width: 100%;
+  }
+  mat-card {
+    max-width: 700px;
+    margin: 32px auto;
+  }
+  

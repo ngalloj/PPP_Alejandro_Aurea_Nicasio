@@ -1,0 +1,28 @@
+<!-- frontend/src/app/pages/login/login.component.html -->
+<h2>Iniciar sesión</h2>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <mat-card>
+    <mat-card-title>Login</mat-card-title>
+    <mat-card-content>
+      <div>
+        <label>Email</label>
+        <input matInput formControlName="email" placeholder="correo@ejemplo.com" type="email">
+        <div *ngIf="emailField?.invalid && emailField?.touched" class="error-msg">
+          Introduce un email válido.
+        </div>
+      </div>
+      <div>
+        <label>Contraseña</label>
+        <input matInput formControlName="password" placeholder="Contraseña" type="password">
+        <div *ngIf="passwordField?.invalid && passwordField?.touched" class="error-msg">
+          Campo obligatorio.
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading">Entrar</button>
+      <span *ngIf="loading" class="spinner">Cargando...</span>
+      <span *ngIf="error" class="error-msg">{{ error }}</span>
+    </mat-card-actions>
+  </mat-card>
+</form>

@@ -1,0 +1,9 @@
+/* frontend/src/app/pages/clientes-citas/clientes-citas.component.css */
+table {
+    width: 100%;
+  }
+  mat-card {
+    max-width: 900px;
+    margin: 32px auto;
+  }
+  

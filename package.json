@@ -1,0 +1,23 @@
+{
+  "name": "clinica-veterinaria-fullstack",
+  "private": true,
+  "description": "Gestión monorepo para frontend y backend del proyecto",
+  "scripts": {
+    "ng": "ng",
+    "start": "concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm start --prefix frontend",
+    "test": "npm test --prefix backend && npm test --prefix frontend",
+    "lint": "npm run lint --prefix frontend",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+    
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0"
+  }
+}

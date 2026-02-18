@@ -1,0 +1,3 @@
+FROM dpage/pgadmin4:latest
+
+RUN pip install --upgrade pip setuptools && pip install "setuptools<81"
