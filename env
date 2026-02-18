@@ -1,0 +1,14 @@
+JWT_SECRET=AVeryStrongPasswordSoThatNobodyCouldBreakIt
+
+MYSQL_DATABASE=clinicaveterinaria2.0
+MYSQL_USER=root
+MYSQL_PASSWORD=gamusino
+MYSQL_ROOT_PASSWORD=gamusino
+
+DB_HOST=localhost
+
+NODE_ENV=development
+
+DB_FORCE_SYNC=false
+
+DEFAULT_ADMIN_PASSWORD="alejandro"
