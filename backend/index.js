@@ -33,7 +33,7 @@ const Usuario = db.Usuario;
 const FORCE_SYNC = process.env.DB_FORCE_SYNC === "true";
 const adminPass = process.env.DEFAULT_ADMIN_PASSWORD || "alejandro";
 
-// Sync DB sin tumbar el servidor si falla
+// Sync DB sin tumbar el server si falla
 db.sequelize
   .sync({ force: FORCE_SYNC })
   .then(async () => {
@@ -82,9 +82,8 @@ app.use((req, res, next) => {
     const token = authHeader.replace("Bearer ", "");
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(401).json({ error: true, message: "Invalid user." });
-      }
+      if (err) return res.status(401).json({ error: true, message: "Invalid user." });
+
       req.user = user;
       req.token = token;
       return next();
@@ -105,14 +104,9 @@ app.get("/", (req, res) => {
   });
 });
 
-// LOGIN PUBLICO (sin token)
-// app.post("/api/usuario/signin", require("./controllers/auth.js").signin);
-app.post("/api/usuario/signin", require("./controllers/baseControllers/auth.js").signin);
-
-
-// Rutas
-// require("./routes/usuario.routes")(app);
+// Rutas (usa SOLO las baseRoutes)
 require("./routes/baseRoutes/usuario.routes")(app);
+
 require("./routes/animal.routes")(app);
 require("./routes/cliente.routes")(app);
 require("./routes/producto.routes")(app);

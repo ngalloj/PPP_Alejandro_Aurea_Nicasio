@@ -1,416 +1,137 @@
-"use strict";
-
-const fs = require("fs");
-const path = require("path");
-const Sequelize = require("sequelize");
-const dbConfig = require("../config/db.config.js");
-
-// --- SSL CA (Aiven) opcional: si existe certs/aiven-ca.pem lo usa ---
-let sslOptions = undefined;
-try {
-  const caPath = path.join(__dirname, "../certs/aiven-ca.pem");
-  if (fs.existsSync(caPath)) {
-    const ca = fs.readFileSync(caPath, "utf8");
-    sslOptions = {
-      ssl: {
-        ca,
-        require: true,
-        rejectUnauthorized: true,
-      },
-    };
-  } else {
-    // Si no hay CA, intenta SSL sin validar (útil para pruebas, no ideal)
-    sslOptions = {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    };
-  }
-} catch (e) {
-  // Si algo falla leyendo el cert, seguimos sin SSL options
-  sslOptions = undefined;
+// Cargar .env solo en local
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
 }
 
-// --- Instancia Sequelize ---
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  host: dbConfig.HOST,
-  port: Number(dbConfig.PORT || process.env.DB_PORT || 3306),
-  dialect: dbConfig.dialect || "mysql",
-  logging: false,
+const express = require("express");
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const path = require("path");
+const bcrypt = require("bcryptjs");
 
-  ...(sslOptions ? { dialectOptions: sslOptions } : {}),
+const app = express();
 
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 10000,
-    acquire: 60000,
-  },
-  retry: { max: 3 },
-});
+// Archivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
 
-// --- Contenedor de modelos ---
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+// CORS (en Render usar CORS_ORIGIN)
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "http://localhost:8100",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
-// =========================
-// CARGA DE MODELOS (SEGÚN TU ÁRBOL)
-// =========================
+// Body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Base
-db.Usuario = require("./base/usuario.js")(sequelize, Sequelize);
-db.Cliente = require("./base/cliente.js")(sequelize, Sequelize);
+// Modelos
+const db = require("./models");
+const Usuario = db.Usuario;
 
-// Animales
-db.Animal = require("./animales/animal.js")(sequelize, Sequelize);
+// Control sync
+const FORCE_SYNC = process.env.DB_FORCE_SYNC === "true";
+const adminPass = process.env.DEFAULT_ADMIN_PASSWORD || "alejandro";
 
-// Historiales
-db.Historial = require("./historiales/historial.js")(sequelize, Sequelize);
-db.LineaHistorial = require("./historiales/lineaHistorial.js")(sequelize, Sequelize);
+// Sync DB sin tumbar el servidor si falla
+db.sequelize
+  .sync({ force: FORCE_SYNC })
+  .then(async () => {
+    console.log("DB sync OK ✅");
 
-// Citas
-db.Cita = require("./citas/cita.js")(sequelize, Sequelize);
+    if (FORCE_SYNC) {
+      const hashedPassword = await bcrypt.hash(adminPass, 10);
 
-// Catálogo
-db.Elemento = require("./catalogo/elemento.js")(sequelize, Sequelize);
-db.Producto = require("./catalogo/producto.js")(sequelize, Sequelize);
+      await Usuario.findOrCreate({
+        where: { email: "alejandro@ppp.com" },
+        defaults: {
+          nombre: "Alejandro",
+          email: "alejandro@ppp.com",
+          contrasena: hashedPassword,
+          rol: "administrativo",
+        },
+      });
 
-// OJO: tu archivo es models/catalogo/Servicio.js (S mayúscula)
-db.Servicio = require("./catalogo/Servicio.js")(sequelize, Sequelize);
+      console.log("Usuario administrador creado");
+    }
+  })
+  .catch((err) => {
+    console.error("DB sync FAILED ❌", err.message || err);
+  });
 
-// Y también existe servicioClinico.js
-db.ServicioClinico = require("./catalogo/servicioClinico.js")(sequelize, Sequelize);
+// Middleware auth (Basic y JWT)
+app.use((req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) return next();
 
-// Compras
-db.Pedido = require("./compras/pedido.js")(sequelize, Sequelize);
-db.LineaPedido = require("./compras/lineaPedido.js")(sequelize, Sequelize);
+  // Basic Auth
+  if (authHeader.startsWith("Basic ")) {
+    const base64Credentials = authHeader.split(" ")[1];
+    const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
+    const [username, password] = credentials.split(":");
 
-// Facturación
-db.Factura = require("./facturacion/factura.js")(sequelize, Sequelize);
-db.LineaFactura = require("./facturacion/lineaFactura.js")(sequelize, Sequelize);
+    if (!req.body || typeof req.body !== "object") req.body = {};
+    req.body.email = username;
+    req.body.contrasena = password;
 
-// Unión (tablas puente)
-db.Atienden = require("./union/atienden.js")(sequelize, Sequelize);
-db.Consultan = require("./union/consultan.js")(sequelize, Sequelize);
-db.Incluyen = require("./union/incluyen.js")(sequelize, Sequelize);
-db.Necesitan = require("./union/necesitan.js")(sequelize, Sequelize);
-db.Realizan = require("./union/realizan.js")(sequelize, Sequelize);
-
-// =========================
-// EJECUCIÓN DE ASOCIACIONES
-// =========================
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName] && typeof db[modelName].associate === "function") {
-    db[modelName].associate(db);
+    return next();
   }
+
+  // Bearer JWT
+  if (authHeader.startsWith("Bearer ")) {
+    const token = authHeader.replace("Bearer ", "");
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+        return res.status(401).json({ error: true, message: "Invalid user." });
+      }
+      req.user = user;
+      req.token = token;
+      return next();
+    });
+
+    return;
+  }
+
+  return next();
 });
 
-module.exports = db;
+// Health / root
+app.get("/", (req, res) => {
+  res.status(200).json({
+    ok: true,
+    message: "API ClinicaVeterinaria2.0 funcionando ✅",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// LOGIN PUBLICO (sin token)
+// app.post("/api/usuario/signin", require("./controllers/auth.js").signin);
+app.post("/api/usuario/signin", require("./controllers/baseControllers/auth.js").signin);
 
 
+// Rutas
+// require("./routes/usuario.routes")(app);
+require("./routes/baseRoutes/usuario.routes")(app);
+require("./routes/animal.routes")(app);
+require("./routes/cliente.routes")(app);
+require("./routes/producto.routes")(app);
+require("./routes/servicioClinico.routes")(app);
+require("./routes/cita.routes")(app);
+require("./routes/pedido.routes")(app);
+require("./routes/factura.routes")(app);
 
-// "use strict";
+require("./routes/lineaPedido.routes")(app);
+require("./routes/lineaFactura.routes")(app);
 
-// const fs = require("fs");
-// const path = require("path");
-// const Sequelize = require("sequelize");
-// const dbConfig = require("../config/db.config.js");
+require("./routes/atienden.routes")(app);
+require("./routes/consultan.routes")(app);
+require("./routes/incluyen.routes")(app);
+require("./routes/necesitan.routes")(app);
+require("./routes/realizan.routes")(app);
 
-// // ---- SSL (Aiven) ----
-// let sslOptions = null;
-// try {
-//   // Ruta típica que estás usando
-//   const caPath = path.join(__dirname, "..", "certs", "aiven-ca.pem");
-//   if (fs.existsSync(caPath)) {
-//     const ca = fs.readFileSync(caPath, "utf8");
-//     sslOptions = {
-//       require: true,
-//       rejectUnauthorized: true,
-//       ca
-//     };
-//   }
-// } catch (e) {
-//   sslOptions = null;
-// }
-
-// // ---- Sequelize instance ----
-// const sequelize = new Sequelize(
-//   dbConfig.DB,
-//   dbConfig.USER,
-//   dbConfig.PASSWORD,
-//   {
-//     host: dbConfig.HOST,
-//     port: Number(dbConfig.PORT || 3306),
-//     dialect: dbConfig.dialect || "mysql",
-//     logging: false,
-
-//     dialectOptions: sslOptions
-//       ? { ssl: sslOptions }
-//       : {},
-
-//     pool: {
-//       max: 5,
-//       min: 0,
-//       idle: 10000,
-//       acquire: 60000
-//     },
-//     retry: { max: 3 }
-//   }
-// );
-
-// // ---- DB container ----
-// const db = {};
-// db.Sequelize = Sequelize;
-// db.sequelize = sequelize;
-
-// // ---- MODELOS (ojo a mayúsculas/minúsculas) ----
-// // Base
-// db.Usuario = require("./base/usuario.js")(sequelize, Sequelize);
-
-// // Animales
-// db.Animal = require("./animales/animal.js")(sequelize, Sequelize);
-
-// // Historial
-// db.Historial = require("./historiales/historial.js")(sequelize, Sequelize);
-// db.LineaHistorial = require("./historiales/lineaHistorial.js")(sequelize, Sequelize);
-
-// // Citas
-// db.Cita = require("./citas/cita.js")(sequelize, Sequelize);
-
-// // Catálogo
-// db.Elemento = require("./catalogo/elemento.js")(sequelize, Sequelize);
-// db.Producto = require("./catalogo/producto.js")(sequelize, Sequelize);
-// db.Servicio = require("./catalogo/Servicio.js")(sequelize, Sequelize); // 👈 ES Servicio.js (S mayúscula)
-
-// // Facturación
-// db.Factura = require("./facturacion/factura.js")(sequelize, Sequelize);
-// db.LineaFactura = require("./facturacion/lineaFactura.js")(sequelize, Sequelize);
-
-// // ---- Asociaciones ----
-// Object.keys(db).forEach((modelName) => {
-//   if (db[modelName] && typeof db[modelName].associate === "function") {
-//     db[modelName].associate(db);
-//   }
-// });
-
-// module.exports = db;
-
-
-
-
-
-
-// // 'use strict';
-
-// // const fs = require('fs');
-// // const path = require('path');
-// // const dbConfig = require("../config/db.config.js");
-// // const Sequelize = require("sequelize");
-
-// // // ---- SSL (Aiven) ----
-// // let sslOptions = null;
-
-// // // Opción A: leer CA desde archivo (recomendado)
-// // try {
-// //   const caPath = path.join(__dirname, '../certs/aiven-ca.pem');
-// //   if (fs.existsSync(caPath)) {
-// //     const ca = fs.readFileSync(caPath, 'utf8');
-// //     sslOptions = {
-// //       require: true,
-// //       rejectUnauthorized: true,
-// //       ca
-// //     };
-// //   }
-// // } catch (e) {
-// //   // si falla, seguimos sin CA
-// // }
-
-// // // Opción B: sin CA (solo para probar; en producción mejor con CA)
-// // if (!sslOptions) {
-// //   sslOptions = {
-// //     require: true,
-// //     rejectUnauthorized: false
-// //   };
-// // }
-
-// // // ---- Sequelize ----
-// // const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-// //   host: dbConfig.HOST,
-// //   port: Number(dbConfig.PORT || 3306),
-// //   dialect: dbConfig.dialect,
-// //   logging: false,
-// //   dialectOptions: {
-// //     ssl: sslOptions
-// //   },
-// //   pool: {
-// //     max: 5,
-// //     min: 0,
-// //     idle: 10000,
-// //     acquire: 60000
-// //   },
-// //   retry: { max: 3 }
-// // });
-
-// // // ---- Contenedor de modelos ----
-// // const db = {};
-// // db.Sequelize = Sequelize;
-// // db.sequelize = sequelize;
-
-// // // ---- CARGA DE MODELOS ----
-// // // Base
-// // db.Usuario = require("./base/usuario.js")(sequelize, Sequelize);
-
-// // // Animales
-// // db.Animal = require("./animales/animal.js")(sequelize, Sequelize);
-
-// // // Historial
-// // db.Historial = require("./historiales/historial.js")(sequelize, Sequelize);
-// // db.LineaHistorial = require("./historiales/lineaHistorial.js")(sequelize, Sequelize);
-
-// // // Citas
-// // db.Cita = require("./citas/cita.js")(sequelize, Sequelize);
-
-// // // Catálogo
-// // db.Elemento = require("./catalogo/elemento.js")(sequelize, Sequelize);
-// db.Producto = require("./catalogo/producto.js")(sequelize, Sequelize);
-
-// // ⚠️ OJO CON EL NOMBRE DEL ARCHIVO EN LINUX:
-// // Si tu archivo real se llama "servicio.js" (minúscula), CAMBIA esta línea a "./catalogo/servicio.js"
-// db.Servicio = require("./catalogo/Servicio.js")(sequelize, Sequelize);
-
-// // Facturación
-// db.Factura = require("./facturacion/factura.js")(sequelize, Sequelize);
-// db.LineaFactura = require("./facturacion/lineaFactura.js")(sequelize, Sequelize);
-
-// // ---- ASOCIACIONES ----
-// Object.keys(db).forEach(modelName => {
-//   if (db[modelName] && typeof db[modelName].associate === "function") {
-//     db[modelName].associate(db);
-//   }
-// });
-
-// module.exports = db;
-
-
-
-
-
-
-
-// // // Se importan parametros del modelo
-// // const dbConfig = require("../config/db.config.js");
-// // //Se importa Sequelize del node module
-// // const Sequelize = require("sequelize");
-
-// // // Se crea la instancia de Sequelize con la configuración de la base de datos
-// // const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-// //   host: dbConfig.HOST,
-// //   dialect: dbConfig.dialect,
-// //   operatorsAliases: false,
-// //   pool: {
-// //     max: dbConfig.pool.max,
-// //     min: dbConfig.pool.min,
-// //     acquire: dbConfig.pool.acquire,
-// //     idle: dbConfig.pool.idle
-// //   }
-// // });
-
-// // //Se crea un objeto para almacenar Sequelize y sequelize 
-// // const db = {};
-// // db.Sequelize = Sequelize;
-// // db.sequelize = sequelize;
-
-// // // //Se cargar el Sequelize y sequelize de los modelos
-// // db.animal = require("./animales/animal.js")(sequelize, Sequelize);
-// // db.cliente = require("./base/cliente.js")(sequelize, Sequelize);
-// // db.usuario = require("./base/usuario.js")(sequelize, Sequelize);
-// // db.producto = require("./catalogo/producto.js")(sequelize, Sequelize);
-// // db.servicioClinico = require("./catalogo/servicioClinico.js")(sequelize, Sequelize);
-// // db.cita = require("./citas/cita.js")(sequelize, Sequelize);
-// // db.pedido = require("./compras/pedido.js")(sequelize, Sequelize);
-// // db.lineaPedido = require("./compras/lineaPedido.js")(sequelize, Sequelize);
-// // db.factura = require("./facturacion/factura.js")(sequelize, Sequelize);
-// // db.lineaFactura = require("./facturacion/lineaFactura.js")(sequelize, Sequelize);
-
-// // db.atienden = require("./union/atienden.js")(sequelize, Sequelize);
-// // db.consultan = require("./union/consultan.js")(sequelize, Sequelize);
-// // db.incluyen = require("./union/incluyen.js")(sequelize, Sequelize);
-// // db.necesitan = require("./union/necesitan.js")(sequelize, Sequelize);
-// // db.realizan = require("./union/realizan.js")(sequelize, Sequelize);
-
-// // //Relaciones de los modelos
-
-// // // Usuarios - Clientes (Consultan)
-
-// // db.usuario.belongsToMany(db.cliente, {
-// //   through: db.consultan,
-// //   foreignKey: "idUsuario",
-// //   otherKey: "idCliente",
-// //   as: "ClientesConsultados"
-// // });
-// // db.cliente.belongsToMany(db.usuario, {
-// //   through: db.consultan,
-// //   foreignKey: "idCliente",
-// //   otherKey: "idUsuario",
-// //   as: "UsuariosQueConsultan"
-// // });
-
-// // // Usuarios - Clientes (Atienden)
-// // db.usuario.belongsToMany(db.cliente, {
-// //   through: db.atienden,
-// //   foreignKey: "idUsuario",
-// //   otherKey: "idCliente",
-// //   as: "ClientesAtendidos"
-// // });
-// // db.cliente.belongsToMany(db.usuario, {
-// //   through: db.atienden,
-// //   foreignKey: "idCliente",
-// //   otherKey: "idUsuario",
-// //   as: "UsuariosQueAtienden"
-// // });
-
-// // // Citas - Productos (Incluyen)
-// // db.cita.belongsToMany(db.producto, {
-// //   through: db.incluyen,
-// //   foreignKey: "idCita",
-// //   otherKey: "idProducto",
-// //   as: "Productos"
-// // });
-// // db.producto.belongsToMany(db.cita, {
-// //   through: db.incluyen,
-// //   foreignKey: "idProducto",
-// //   otherKey: "idCita",
-// //   as: "Citas"
-// // });
-
-// // // Productos -ServicioClinico (Necesitan)
-// // db.producto.belongsToMany(db.servicioClinico, {
-// //   through: db.necesitan,
-// //   foreignKey: "idProducto",
-// //   otherKey: "idServicio",
-// //   as: "ServiciosNecesarios"
-// // });
-// // db.servicioClinico.belongsToMany(db.producto, {
-// //   through: db.necesitan,
-// //   foreignKey: "idServicio",
-// //   otherKey: "idProducto",
-// //   as: "ProductosQueNecesitan"
-// // });
-
-// // // Productos - Pedidos (Realizan)
-// // db.producto.belongsToMany(db.pedido, {
-// //   through: db.realizan,
-// //   foreignKey: "idProducto",
-// //   otherKey: "idPedido",
-// //   as: "Pedidos"
-// // });
-// // db.pedido.belongsToMany(db.producto, {
-// //   through: db.realizan,
-// //   foreignKey: "idPedido",
-// //   otherKey: "idProducto",
-// //   as: "Productos"
-// // });
-
-// // module.exports = db;
+// Port
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
