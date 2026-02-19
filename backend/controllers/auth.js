@@ -1,3 +1,4 @@
 module.exports = require("./baseControllers/auth.js");
-const User = db.Usuario;
+const db = require("../models");
+const User = db.Usuario; // ✅ no db.usuario
 

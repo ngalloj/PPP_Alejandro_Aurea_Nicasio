@@ -1,6 +1,6 @@
 module.exports = (app) => {
   const animal = require("../controllers/animal.controller.js");
-  const auth = require("../controllers/auth.js");
+  const auth = require("../controllers/baseControllers/auth.js");
   const router = require("express").Router();
 
   router.post("/", auth.isAuthenticated, animal.create);
