@@ -7,7 +7,8 @@ const bcrypt = require('bcryptjs');
 
 // importación del modelo usuarios y creación de un objeto 
 const db = require("../models");
-const User = db.usuario;
+const User = db.Usuario; // ✅ antes estaba db.usuario (mal)
+
 
 
 exports.signin = (req, res) => {

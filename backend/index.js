@@ -105,6 +105,10 @@ app.get("/", (req, res) => {
   });
 });
 
+// LOGIN PUBLICO (sin token)
+app.post("/api/usuario/signin", require("./controllers/auth.js").signin);
+
+
 // Rutas
 require("./routes/usuario.routes")(app);
 require("./routes/animal.routes")(app);

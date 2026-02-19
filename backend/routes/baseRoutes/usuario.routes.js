@@ -7,8 +7,9 @@ module.exports = app => {
   
     var router = require("express").Router();
   
-    // Autentificación de usuario (SIN auth)
-router.post("/signin", auth.signin);
+   
+// 1) LOGIN SIEMPRE ARRIBA
+router.post("/signin", auth.signin);    
 
 // Crea un nuevo usuario
 router.post("/", auth.isAuthenticated, users.create);
