@@ -30,11 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Usuario.associate = (models) => {
-    // ✅ Importante: asegurarte de que existen los modelos puente
-    // (si alguno es undefined, Sequelize peta con "not a subclass of Sequelize.Model")
-    if (!models.Cliente || !models.Consultan || !models.Atienden) return;
-
-    // Usuarios - Clientes (Consultan)
+    // Usuarios <-> Clientes (Consultan)
     Usuario.belongsToMany(models.Cliente, {
       through: models.Consultan,
       foreignKey: 'idUsuario',
@@ -42,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'ClientesConsultados'
     });
 
-    // Usuarios - Clientes (Atienden)
+    // Usuarios <-> Clientes (Atienden)
     Usuario.belongsToMany(models.Cliente, {
       through: models.Atienden,
       foreignKey: 'idUsuario',
