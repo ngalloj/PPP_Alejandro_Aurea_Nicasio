@@ -118,6 +118,13 @@ app.use((req, res, next) => {
   return next();
 });
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    ok: true,
+    message: "API ClinicaVeterinaria2.0 funcionando ✅",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Se cargan y registran las rutas 
 
