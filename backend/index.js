@@ -110,7 +110,8 @@ app.post("/api/usuario/signin", require("./controllers/auth.js").signin);
 
 
 // Rutas
-require("./routes/usuario.routes")(app);
+// require("./routes/usuario.routes")(app);
+require("./routes/baseRoutes/usuario.routes")(app);
 require("./routes/animal.routes")(app);
 require("./routes/cliente.routes")(app);
 require("./routes/producto.routes")(app);
