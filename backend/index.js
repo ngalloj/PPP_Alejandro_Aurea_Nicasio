@@ -48,7 +48,7 @@ db.sequelize
           nombre: "Alejandro",
           email: "alejandro@ppp.com",
           contrasena: hashedPassword,
-          rol: "administrador",
+          rol: "administrativo", // ✅ ESTE
         },
       });
 
