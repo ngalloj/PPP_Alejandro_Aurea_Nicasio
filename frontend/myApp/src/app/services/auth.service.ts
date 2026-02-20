@@ -14,17 +14,21 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Base URL del backend (Render)
-  private readonly API_BASE = 'https://clinicaveterinaria2-0.onrender.com/api';
+  private readonly API_BASE =
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:8080'
+      : 'https://clinicaveterinaria2-0.onrender.com';
 
-  private readonly tokenKey = 'access_token';
-  private readonly userKey = 'usuario';
+  private readonly apiUrl = `${this.API_BASE}/api/usuario`;
+
+  private tokenKey = 'access_token';
+  private userKey = 'usuario';
 
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.API_BASE}/usuario/signin`, body);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
   }
 
   saveSession(resp: LoginResponse) {
@@ -56,6 +60,6 @@ export class AuthService {
   }
 
   getUsuarios() {
-    return this.http.get(`${this.API_BASE}/usuario`, { headers: this.authHeaders() });
+    return this.http.get(`${this.apiUrl}`, { headers: this.authHeaders() });
   }
 }

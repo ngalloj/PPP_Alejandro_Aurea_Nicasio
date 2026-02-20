@@ -14,20 +14,27 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Base URL del backend (Render)
-  private readonly API_BASE = 'https://clinicaveterinaria2-0.onrender.com/api';
+  /**
+   * En producción (Netlify) debe apuntar a Render.
+   * En local (localhost) apunta a tu API local.
+   */
+  private readonly API_BASE =
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:8080'
+      : 'https://clinicaveterinaria2-0.onrender.com';
 
-  private readonly tokenKey = 'access_token';
-  private readonly userKey = 'usuario';
+  // Base de usuario (SIN /signin al final)
+  private readonly apiUrl = `${this.API_BASE}/api/usuario`;
+
+  private tokenKey = 'access_token';
+  private userKey = 'usuario';
 
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
     // el backend espera "contrasena"
     const body = { email, contrasena: password };
-
-    // ✅ endpoint correcto: /api/usuario/signin
-    return this.http.post<LoginResponse>(`${this.API_BASE}/usuario/signin`, body);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
   }
 
   saveSession(resp: LoginResponse) {
@@ -58,8 +65,8 @@ export class AuthService {
     return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  // Ejemplo: endpoint protegido (lista usuarios)
+  // Ejemplo de endpoint protegido
   getUsuarios() {
-    return this.http.get(`${this.API_BASE}/usuario`, { headers: this.authHeaders() });
+    return this.http.get(`${this.apiUrl}`, { headers: this.authHeaders() });
   }
 }
