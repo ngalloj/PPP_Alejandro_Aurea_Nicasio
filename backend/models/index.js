@@ -1,137 +1,108 @@
-// Cargar .env solo en local
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
+"use strict";
+
+const fs = require("fs");
+const path = require("path");
+const Sequelize = require("sequelize");
+const dbConfig = require("../config/db.config.js");
+
+// --- SSL CA (Aiven) opcional: si existe certs/aiven-ca.pem lo usa ---
+let sslOptions = undefined;
+try {
+  const caPath = path.join(__dirname, "../certs/aiven-ca.pem");
+  if (fs.existsSync(caPath)) {
+    const ca = fs.readFileSync(caPath, "utf8");
+    sslOptions = {
+      ssl: {
+        ca,
+        require: true,
+        rejectUnauthorized: true,
+      },
+    };
+  } else {
+    // Si no hay CA, intenta SSL sin validar (solo pruebas)
+    sslOptions = {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    };
+  }
+} catch (e) {
+  sslOptions = undefined;
 }
 
-const express = require("express");
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const path = require("path");
-const bcrypt = require("bcryptjs");
+// --- Instancia Sequelize ---
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+  host: dbConfig.HOST,
+  port: Number(dbConfig.PORT || process.env.DB_PORT || 3306),
+  dialect: dbConfig.dialect || "mysql",
+  logging: false,
 
-const app = express();
+  ...(sslOptions ? { dialectOptions: sslOptions } : {}),
 
-// Archivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 10000,
+    acquire: 60000,
+  },
+  retry: { max: 3 },
+});
 
-// CORS (en Render usar CORS_ORIGIN)
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "http://localhost:8100",
-  credentials: true,
-};
-app.use(cors(corsOptions));
+// --- Contenedor de modelos ---
+const db = {};
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
-// Body
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// =========================
+// CARGA DE MODELOS
+// =========================
 
-// Modelos
-const db = require("./models");
-const Usuario = db.Usuario;
+// Base
+db.Usuario = require("./base/usuario.js")(sequelize, Sequelize);
+db.Cliente = require("./base/cliente.js")(sequelize, Sequelize);
 
-// Control sync
-const FORCE_SYNC = process.env.DB_FORCE_SYNC === "true";
-const adminPass = process.env.DEFAULT_ADMIN_PASSWORD || "alejandro";
+// Animales
+db.Animal = require("./animales/animal.js")(sequelize, Sequelize);
 
-// Sync DB sin tumbar el servidor si falla
-db.sequelize
-  .sync({ force: FORCE_SYNC })
-  .then(async () => {
-    console.log("DB sync OK ✅");
+// Historiales
+db.Historial = require("./historiales/historial.js")(sequelize, Sequelize);
+db.LineaHistorial = require("./historiales/lineaHistorial.js")(sequelize, Sequelize);
 
-    if (FORCE_SYNC) {
-      const hashedPassword = await bcrypt.hash(adminPass, 10);
+// Citas
+db.Cita = require("./citas/cita.js")(sequelize, Sequelize);
 
-      await Usuario.findOrCreate({
-        where: { email: "alejandro@ppp.com" },
-        defaults: {
-          nombre: "Alejandro",
-          email: "alejandro@ppp.com",
-          contrasena: hashedPassword,
-          rol: "administrativo",
-        },
-      });
+// Catálogo
+db.Elemento = require("./catalogo/elemento.js")(sequelize, Sequelize);
+db.Producto = require("./catalogo/producto.js")(sequelize, Sequelize);
 
-      console.log("Usuario administrador creado");
-    }
-  })
-  .catch((err) => {
-    console.error("DB sync FAILED ❌", err.message || err);
-  });
+// OJO: tu archivo es models/catalogo/Servicio.js (S mayúscula)
+db.Servicio = require("./catalogo/Servicio.js")(sequelize, Sequelize);
 
-// Middleware auth (Basic y JWT)
-app.use((req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader) return next();
+db.ServicioClinico = require("./catalogo/servicioClinico.js")(sequelize, Sequelize);
 
-  // Basic Auth
-  if (authHeader.startsWith("Basic ")) {
-    const base64Credentials = authHeader.split(" ")[1];
-    const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
-    const [username, password] = credentials.split(":");
+// Compras
+db.Pedido = require("./compras/pedido.js")(sequelize, Sequelize);
+db.LineaPedido = require("./compras/lineaPedido.js")(sequelize, Sequelize);
 
-    if (!req.body || typeof req.body !== "object") req.body = {};
-    req.body.email = username;
-    req.body.contrasena = password;
+// Facturación
+db.Factura = require("./facturacion/factura.js")(sequelize, Sequelize);
+db.LineaFactura = require("./facturacion/lineaFactura.js")(sequelize, Sequelize);
 
-    return next();
+// Unión (tablas puente)
+db.Atienden = require("./union/atienden.js")(sequelize, Sequelize);
+db.Consultan = require("./union/consultan.js")(sequelize, Sequelize);
+db.Incluyen = require("./union/incluyen.js")(sequelize, Sequelize);
+db.Necesitan = require("./union/necesitan.js")(sequelize, Sequelize);
+db.Realizan = require("./union/realizan.js")(sequelize, Sequelize);
+
+// =========================
+// EJECUCIÓN DE ASOCIACIONES
+// =========================
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName] && typeof db[modelName].associate === "function") {
+    db[modelName].associate(db);
   }
-
-  // Bearer JWT
-  if (authHeader.startsWith("Bearer ")) {
-    const token = authHeader.replace("Bearer ", "");
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(401).json({ error: true, message: "Invalid user." });
-      }
-      req.user = user;
-      req.token = token;
-      return next();
-    });
-
-    return;
-  }
-
-  return next();
 });
 
-// Health / root
-app.get("/", (req, res) => {
-  res.status(200).json({
-    ok: true,
-    message: "API ClinicaVeterinaria2.0 funcionando ✅",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// LOGIN PUBLICO (sin token)
-// app.post("/api/usuario/signin", require("./controllers/auth.js").signin);
-app.post("/api/usuario/signin", require("./controllers/baseControllers/auth.js").signin);
-
-
-// Rutas
-// require("./routes/usuario.routes")(app);
-require("./routes/baseRoutes/usuario.routes")(app);
-require("./routes/animal.routes")(app);
-require("./routes/cliente.routes")(app);
-require("./routes/producto.routes")(app);
-require("./routes/servicioClinico.routes")(app);
-require("./routes/cita.routes")(app);
-require("./routes/pedido.routes")(app);
-require("./routes/factura.routes")(app);
-
-require("./routes/lineaPedido.routes")(app);
-require("./routes/lineaFactura.routes")(app);
-
-require("./routes/atienden.routes")(app);
-require("./routes/consultan.routes")(app);
-require("./routes/incluyen.routes")(app);
-require("./routes/necesitan.routes")(app);
-require("./routes/realizan.routes")(app);
-
-// Port
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+module.exports = db;
