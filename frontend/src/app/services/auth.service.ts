@@ -14,21 +14,20 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  /**
-   * BASE del backend (Render)
-   * OJO: aquí NO va /signin, solo la base /api
-   */
-  private readonly apiBase = 'https://clinicaveterinaria2-0.onrender.com/api';
+  // ✅ BASE del backend (Render)
+  private readonly baseUrl = 'https://clinicaveterinaria2-0.onrender.com';
 
-  private readonly tokenKey = 'access_token';
-  private readonly userKey = 'usuario';
+  private tokenKey = 'access_token';
+  private userKey = 'usuario';
 
   constructor(private http: HttpClient) {}
 
-  /** POST /api/usuario/signin */
   login(email: string, password: string): Observable<LoginResponse> {
+    // el backend espera "contrasena"
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.apiBase}/usuario/signin`, body);
+
+    // ✅ endpoint correcto (una sola vez)
+    return this.http.post<LoginResponse>(`${this.baseUrl}/api/usuario/signin`, body);
   }
 
   saveSession(resp: LoginResponse) {
@@ -54,14 +53,14 @@ export class AuthService {
     localStorage.removeItem(this.userKey);
   }
 
-  /** Para endpoints protegidos */
+  // Para endpoints protegidos: Authorization: Bearer <token>
   authHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  /** Ejemplo: GET /api/usuario (protegido) */
+  // (Opcional) ejemplo de llamada protegida:
   getUsuarios() {
-    return this.http.get(`${this.apiBase}/usuario`, { headers: this.authHeaders() });
+    return this.http.get(`${this.baseUrl}/api/usuario`, { headers: this.authHeaders() });
   }
 }
