@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 
-export type Role = 'administrador' | 'veterinario' | 'recepcionista' | 'cliente';
+export type Role = 'administrativo' | 'veterinario' | 'recepcionista' | 'cliente';
 
 export interface Usuario {
   idUsuario: number;
