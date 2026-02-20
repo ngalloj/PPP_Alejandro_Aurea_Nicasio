@@ -56,7 +56,8 @@ export interface UpdateUsuarioDto {
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:8080/api/usuario';
+  // private apiUrl = 'http://localhost:8080/api/usuario';
+  private apiUrl = 'https://clinicaveterinaria2-0.onrender.com/api/usuario';
 
   constructor(
     private http: HttpClient,
