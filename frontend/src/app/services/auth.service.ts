@@ -14,7 +14,7 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // ✅ BASE del backend (Render)
+  // ✅ Base de tu backend en Render (SIN /api...)
   private readonly baseUrl = 'https://clinicaveterinaria2-0.onrender.com';
 
   private tokenKey = 'access_token';
@@ -23,9 +23,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
-    // el backend espera "contrasena"
     const body = { email, contrasena: password };
-
     // ✅ endpoint correcto (una sola vez)
     return this.http.post<LoginResponse>(`${this.baseUrl}/api/usuario/signin`, body);
   }
@@ -53,13 +51,12 @@ export class AuthService {
     localStorage.removeItem(this.userKey);
   }
 
-  // Para endpoints protegidos: Authorization: Bearer <token>
   authHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  // (Opcional) ejemplo de llamada protegida:
+  // Ejemplo de llamada protegida
   getUsuarios() {
     return this.http.get(`${this.baseUrl}/api/usuario`, { headers: this.authHeaders() });
   }

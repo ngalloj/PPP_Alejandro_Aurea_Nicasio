@@ -14,7 +14,6 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // ✅ BASE del backend (Render)
   private readonly baseUrl = 'https://clinicaveterinaria2-0.onrender.com';
 
   private tokenKey = 'access_token';
