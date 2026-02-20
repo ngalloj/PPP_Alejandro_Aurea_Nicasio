@@ -6,36 +6,31 @@ const Sequelize = require("sequelize");
 const dbConfig = require("../config/db.config.js");
 
 // SSL (Aiven)
-let dialectOptions = {};
+// SSL opcional (Aiven CA si la tienes)
+let sslOptions;
 try {
   const caPath = path.join(__dirname, "../certs/aiven-ca.pem");
   if (fs.existsSync(caPath)) {
     const ca = fs.readFileSync(caPath, "utf8");
-    dialectOptions = {
-      ssl: { ca, require: true, rejectUnauthorized: true },
-    };
+    sslOptions = { ssl: { ca, require: true, rejectUnauthorized: true } };
   } else {
-    // Si no tienes el CA en repo, prueba sin validar (no ideal, pero sirve)
-    dialectOptions = {
-      ssl: { require: true, rejectUnauthorized: false },
-    };
+    sslOptions = { ssl: { require: true, rejectUnauthorized: false } };
   }
 } catch (e) {
-  dialectOptions = {};
+  sslOptions = undefined;
+  // Si no tienes el CA en repo, prueba sin validar (no ideal, pero sirve)
+  dialectOptions = {
+    ssl: { require: true, rejectUnauthorized: false },
+  };
 }
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   port: Number(dbConfig.PORT || 3306),
-  dialect: "mysql",
+  dialect: dbConfig.dialect || "mysql",
   logging: false,
-  dialectOptions,
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 10000,
-    acquire: 60000,
-  },
+  ...(sslOptions ? { dialectOptions: sslOptions } : {}),
+  pool: { max: 5, min: 0, idle: 10000, acquire: 60000 },
   retry: { max: 3 },
 });
 
