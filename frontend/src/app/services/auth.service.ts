@@ -15,7 +15,8 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   // Ajusta host/puerto a tu backend real
-  private apiUrl = 'http://localhost:8080/api/usuario';
+  // private apiUrl = 'http://localhost:8080/api/usuario';
+  private apiUrl = 'https://clinicaveterinaria2-0.onrender.com/api/usuario/signin';
 
   private tokenKey = 'access_token';
   private userKey = 'usuario';
