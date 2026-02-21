@@ -7,25 +7,24 @@ module.exports = app => {
   
     var router = require("express").Router();
   
-   
-// 1) LOGIN SIEMPRE ARRIBA
-router.post("/signin", auth.signin);    
+    // Crea un nuevo usuario
+    router.post("/",auth.isAuthenticated,/*upload.single('file'),*/users.create);
+  
+    // Muestra todos los usuarios
+    router.get("/", auth.isAuthenticated, users.findAll);
+    
+    // Localiza un usuario por la id
+    router.get("/:id", auth.isAuthenticated, users.findOne);
+  
+    // Actualiza un usuario por la id
+    router.put("/:id", auth.isAuthenticated,/*upload.single('file'),*/ users.update);
 
-// Crea un nuevo usuario
-router.post("/", auth.isAuthenticated, users.create);
-
-// Muestra todos los usuarios
-router.get("/", auth.isAuthenticated, users.findAll);
-
-// Localiza un usuario por la id
-router.get("/:id", auth.isAuthenticated, users.findOne);
-
-// Actualiza un usuario por la id
-router.put("/:id", auth.isAuthenticated, users.update);
-
-// Borra un usuario por la id
-router.delete("/:id", auth.isAuthenticated, users.delete);
-
-app.use("/api/usuario", router);
-
+    // Autentificación de usuario
+    router.post("/signin", auth.signin);
+  
+    // Borra un usuario por la id
+    router.delete("/:id",auth.isAuthenticated, users.delete);
+  
+  
+    app.use('/api/usuario', router);
   };

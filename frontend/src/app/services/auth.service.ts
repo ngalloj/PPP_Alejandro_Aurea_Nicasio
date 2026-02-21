@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-// Ajusta este import a tu proyecto si la ruta cambia:
-import { environment } from 'src/environments/environment';
+import { Observable} from 'rxjs';
 
 export interface LoginResponse {
   usuario: {
@@ -17,8 +14,8 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Base API (sin /usuario)
-  private apiBase = environment.apiBaseUrl; // ej: https://clinicaveterinaria2-0.onrender.com
+  // Ajusta host/puerto a tu backend real
+  private apiUrl = 'http://localhost:8080/api/usuario';
 
   private tokenKey = 'access_token';
   private userKey = 'usuario';
@@ -26,8 +23,9 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
+    // el backend espera "contrasena"
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.apiBase}/api/usuario/signin`, body);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
   }
 
   saveSession(resp: LoginResponse) {
@@ -53,13 +51,14 @@ export class AuthService {
     localStorage.removeItem(this.userKey);
   }
 
+  // Para endpoints protegidos: añade Authorization: Bearer <token>
   authHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  // Ejemplo (ruta protegida)
+  // Ejemplo: pedir usuarios (ruta protegida)
   getUsuarios() {
-    return this.http.get(`${this.apiBase}/api/usuario`, { headers: this.authHeaders() });
+    return this.http.get(`${this.apiUrl}`, { headers: this.authHeaders() });
   }
 }

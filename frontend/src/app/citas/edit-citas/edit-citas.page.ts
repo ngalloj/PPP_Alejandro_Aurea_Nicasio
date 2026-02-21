@@ -107,7 +107,7 @@ export class EditCitasPage {
         (users || []).forEach(u => this.usuariosById.set(u.idUsuario, u));
 
         this.veterinarios = (users || []).filter(u => u.rol === 'veterinario');
-        this.programadores = (users || []).filter(u => u.rol === 'administrativo' || u.rol === 'recepcionista');
+        this.programadores = (users || []).filter(u => u.rol === 'administrador' || u.rol === 'recepcionista');
 
         // 2) animales
         this.animalService.getAnimales().subscribe({
@@ -249,7 +249,7 @@ export class EditCitasPage {
     if (!id) return '-';
     const u = this.usuariosById.get(id);
     if (!u) return `${id}`;
-    return `${u.idUsuario} - ${u.nombre}${u.apellidos ? ' ' + u.apellidos : ''}`.trim();
+    return `${u.nif} - ${u.nombre}${u.apellidos ? ' ' + u.apellidos : ''}`.trim();
   }
 
   animalLabelById(idAnimal: number | null | undefined): string {
@@ -258,7 +258,7 @@ export class EditCitasPage {
     if (!a) return `${idAnimal}`;
     const dueno = this.usuariosById.get(a.idUsuario);
     const duenoNombre = dueno
-      ? `${dueno.nombre}${dueno.apellidos ? ' ' + dueno.apellidos : ''}`.trim()
+      ? `${dueno.nombre}${dueno.apellidos ? ' ' + dueno.apellidos : ''}${dueno.nif ? ' (' + dueno.nif + ')' : ''}`.trim()
       : `idUsuario ${a.idUsuario}`;
     return `${a.idAnimal} - ${a.nombre} (Dueño: ${duenoNombre})`;
   }
@@ -266,7 +266,7 @@ export class EditCitasPage {
   animalOptionLabel(a: Animal): string {
     const dueno = this.usuariosById.get(a.idUsuario);
     const duenoNombre = dueno
-      ? `${dueno.nombre}${dueno.apellidos ? ' ' + dueno.apellidos : ''}`.trim()
+      ? `${dueno.nombre}${dueno.apellidos ? ' ' + dueno.apellidos : ''}${dueno.nif ? ' (' + dueno.nif + ')' : ''}`.trim()
       : `idUsuario ${a.idUsuario}`;
     return `${a.idAnimal} - ${a.nombre} (Dueño: ${duenoNombre})`;
   }

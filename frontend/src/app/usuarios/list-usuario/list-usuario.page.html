@@ -31,7 +31,7 @@
         <ion-label>Rol</ion-label>
         <ion-select [(ngModel)]="filtroRol" (ionChange)="aplicarFiltros()">
           <ion-select-option value="todos">Todos</ion-select-option>
-          <ion-select-option value="administrativo">Administrador</ion-select-option>
+          <ion-select-option value="administrador">Administrador</ion-select-option>
           <ion-select-option value="veterinario">Veterinario</ion-select-option>
           <ion-select-option value="recepcionista">Recepcionista</ion-select-option>
           <ion-select-option value="cliente">Cliente</ion-select-option>
@@ -65,6 +65,7 @@
 
       <ion-label>
         <h2>{{u.nombre}} {{u.apellidos}}</h2>
+        <p><b>Nif:</b> {{u.nif}}</p>
         <p><b>Email:</b> {{u.email}}</p>
         <p><b>Rol:</b> {{u.rol}}</p>
       </ion-label>

@@ -16,7 +16,7 @@ export class FormUsuarioPage {
   errorMsg = '';
   okMsg = '';
 
-  roles: Role[] = ['administrativo', 'veterinario', 'recepcionista', 'cliente'];
+  roles: Role[] = ['administrador', 'veterinario', 'recepcionista', 'cliente'];
 
   form: CreateUsuarioDto = {
     nombre: '',
@@ -44,13 +44,13 @@ export class FormUsuarioPage {
   get canNuevo(): boolean {
     // Para usuarios, el “nuevo” de vet/recep depende de ctx.esCliente,
     // pero en form SIEMPRE vamos a crear cliente para ellos.
-    const esClienteTarget = this.role === 'administrativo' ? (this.form.rol === 'cliente') : true;
+    const esClienteTarget = this.role === 'administrador' ? (this.form.rol === 'cliente') : true;
     return this.permisos.can('usuarios', 'nuevo', { esCliente: esClienteTarget });
   }
 
   // Admin puede elegir rol; resto NO
   get canElegirRol(): boolean {
-    return this.role === 'administrativo';
+    return this.role === 'administrador';
   }
 
   ionViewWillEnter() {

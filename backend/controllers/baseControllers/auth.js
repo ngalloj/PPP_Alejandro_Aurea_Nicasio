@@ -6,8 +6,8 @@ const utils = require('../../utils.js');
 const bcrypt = require('bcryptjs');
 
 // importación del modelo usuarios y creación de un objeto 
-const db = require("../../models"); // ✅ sin /index.js
-const User = db.Usuario; // ✅ Usuario con U mayúscula
+const db = require("../../models/index.js");
+const User = db.Usuario;
 
 
 exports.signin = (req, res) => {

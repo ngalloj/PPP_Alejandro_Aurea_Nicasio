@@ -2,59 +2,29 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Producto = sequelize.define('Producto', {
-    idProducto: {
+    //idElemento: { type: DataTypes.INTEGER, primaryKey: true },
+    idElemento: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    nombre: {
-      type: DataTypes.STRING(100),
-      allowNull: false
-    },
-    descripcion: {
-      type: DataTypes.STRING(255)
-    },
-    unidadMedia: {
-      type: DataTypes.STRING(50)
-    },
-    stock: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    stockMinimo: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
+      allowNull: false,  // ← Solo esto
+      references: {
+        model: 'ELEMENTOS',
+        key: 'idElemento'
+      }
+    }, // Added closing brace here
+    stock: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    stockMinimo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     tipo: {
-      type: DataTypes.ENUM('medicacion', 'material', 'alimentacion', 'complementos'),
+      type: DataTypes.ENUM('medicamento', 'material', 'alimentacion', 'complementos'),
       allowNull: false
-    }
+    },
+    foto: { type: DataTypes.STRING(255), allowNull: true }
   }, {
-    tableName: 'Productos',
+    tableName: 'PRODUCTOS',
     timestamps: false
   });
 
   Producto.associate = (models) => {
-    Producto.belongsToMany(models.Cita, {
-      through: models.Incluyen,
-      foreignKey: 'idProducto',
-      otherKey: 'idCita'
-    });
-
-    Producto.belongsToMany(models.ServicioClinico, {
-      through: models.Necesitan,
-      foreignKey: 'idProducto',
-      otherKey: 'idServicio'
-    });
-
-    Producto.belongsToMany(models.Pedido, {
-      through: models.Realizan,
-      foreignKey: 'idProducto',
-      otherKey: 'idPedido'
-    });
-
-    Producto.hasMany(models.LineaFactura, { foreignKey: 'idProducto' });
-    Producto.hasMany(models.LineaPedido, { foreignKey: 'idProducto' });
+    Producto.belongsTo(models.Elemento, { foreignKey: 'idElemento', as: 'Elemento' });
   };
 
   return Producto;
