@@ -30,7 +30,15 @@ const corsOptions = {
   credentials: true
 };
 // Se indica que solo se admiten peticiones de este frontend (se deja abierto)
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+pp.use(cors({
+  origin: [
+    'http://localhost:4200', 
+    'http://localhost:8100',
+    'https://clinicaveterinariappp2026v2.netlify.app'  // ← AÑADE ESTO
+  ],
+  credentials: true
+}));
 
 
 // permite leer JSON en el body de la petición
