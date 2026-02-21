@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable} from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface LoginResponse {
   usuario: {
@@ -15,8 +16,9 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   // Ajusta host/puerto a tu backend real
-  private apiUrl = 'http://localhost:8080/api/usuario';
-
+  //private apiUrl = 'http://localhost:8080/api/usuario';
+  private apiUrl = environment.apiUrl;
+ 
   private tokenKey = 'access_token';
   private userKey = 'usuario';
 

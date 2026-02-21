@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
+
 
 export type Role = 'administrador' | 'veterinario' | 'recepcionista' | 'cliente';
 
@@ -56,7 +58,8 @@ export interface UpdateUsuarioDto {
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:8080/api/usuario';
+  //private apiUrl = 'http://localhost:8080/api/usuario';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
