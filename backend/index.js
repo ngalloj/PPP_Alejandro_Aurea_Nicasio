@@ -31,7 +31,7 @@ const corsOptions = {
 };
 // Se indica que solo se admiten peticiones de este frontend (se deja abierto)
 // app.use(cors(corsOptions));
-pp.use(cors({
+app.use(cors({
   origin: [
     'http://localhost:4200', 
     'http://localhost:8100',
