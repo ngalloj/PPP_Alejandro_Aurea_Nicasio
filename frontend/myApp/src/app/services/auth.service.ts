@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+// Ajusta este import a tu proyecto si la ruta cambia:
+import { environment } from 'src/environments/environment';
+
 export interface LoginResponse {
   usuario: {
     idUsuario?: number;
@@ -14,7 +17,7 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'https://clinicaveterinaria2-0.onrender.com';
+  private apiBase = environment.apiUrl; // ej: https://clinicaveterinaria2-0.onrender.com
 
   private tokenKey = 'access_token';
   private userKey = 'usuario';
@@ -23,7 +26,7 @@ export class AuthService {
 
   login(email: string, password: string): Observable<LoginResponse> {
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.baseUrl}/api/usuario/signin`, body);
+    return this.http.post<LoginResponse>(`${this.apiBase}/api/usuario/signin`, body);
   }
 
   saveSession(resp: LoginResponse) {
@@ -55,6 +58,6 @@ export class AuthService {
   }
 
   getUsuarios() {
-    return this.http.get(`${this.baseUrl}/api/usuario`, { headers: this.authHeaders() });
+    return this.http.get(`${this.apiBase}/api/usuario`, { headers: this.authHeaders() });
   }
 }
