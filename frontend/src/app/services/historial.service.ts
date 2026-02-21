@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
+
 
 export type EstadoHistorial = 'Activo' | 'Inactivo';
 
@@ -53,6 +55,7 @@ export interface UpdateHistorialDto {
 @Injectable({ providedIn: 'root' })
 export class HistorialService {
   private baseUrl = 'http://localhost:8080/api/historial';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
