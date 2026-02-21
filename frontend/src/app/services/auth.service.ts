@@ -27,8 +27,13 @@ export class AuthService {
   login(email: string, password: string): Observable<LoginResponse> {
     // el backend espera "contrasena"
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/usuario/signin`, body);
   }
+
+  signin(data: any) {
+    return this.http.post(`${this.apiUrl}/usuario/signin`, data);
+  }
+
 
   saveSession(resp: LoginResponse) {
     localStorage.setItem(this.tokenKey, resp.access_token);
