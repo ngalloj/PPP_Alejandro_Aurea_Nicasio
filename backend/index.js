@@ -47,6 +47,9 @@ app.use(express.json());
 // parsea datos enviados por formularios HTML
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cors({ origin: true, credentials: true }));
+
+
 
 //Se importa el modelo 
 const db = require("./models");
