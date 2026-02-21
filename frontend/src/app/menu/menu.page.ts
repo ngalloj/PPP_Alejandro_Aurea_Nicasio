@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-type Role = 'administrador' | 'veterinario' | 'recepcionista' | 'cliente';
+type Role = 'administrativo' | 'veterinario' | 'recepcionista' | 'cliente';
 
 interface MenuItem {
   title: string;
@@ -19,7 +19,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     
     url: '/list-usuario',
     icon: 'people',
-    roles: ['administrador', 'veterinario', 'recepcionista'],
+    roles: ['administrativo', 'veterinario', 'recepcionista'],
     description: 'Gestión de usuarios',
   },
 
@@ -37,35 +37,35 @@ const ALL_MENU_ITEMS: MenuItem[] = [
     title: 'Citas',
     url: '/list-citas',
     icon: 'calendar',
-    roles: ['administrador', 'veterinario', 'recepcionista', 'cliente'],
+    roles: ['administrativo', 'veterinario', 'recepcionista', 'cliente'],
     description: 'Listado de citas',
   },
   {
     title: 'Historiales',
     url: '/list-historiales',
     icon: 'document-text',
-    roles: ['administrador', 'veterinario', 'recepcionista',],
+    roles: ['administrativo', 'veterinario', 'recepcionista',],
     description: 'Listado de historiales médicos de animales',
   },
   {
     title: 'Facturas',
     url: '/list-facturas',
     icon: 'receipt',
-    roles: ['administrador', 'veterinario', 'recepcionista'],
+    roles: ['administrativo', 'veterinario', 'recepcionista'],
     description: 'Listado de facturas',
   },
   {
     title: 'Catálogo',
     url: '/menu-catalogo',
     icon: 'pricetag',
-    roles: ['administrador', 'veterinario', 'recepcionista'],
+    roles: ['administrativo', 'veterinario', 'recepcionista'],
     description: 'Listado de productos y servicios ofrecidos por la clínica',
   },
   {
     title: 'Animales',
     url: '/list-animales',
     icon: 'paw',
-    roles: ['administrador', 'veterinario', 'recepcionista', 'cliente'],
+    roles: ['administrativo', 'veterinario', 'recepcionista', 'cliente'],
     description: 'Listado de animales registrados',
   },
 ];
@@ -134,7 +134,7 @@ goTo(item: MenuItem) {
 
   private getRoleLabel(role: Role | ''): string {
     switch (role) {
-      case 'administrador': return 'Administrador';
+      case 'administrativo': return 'Administrador';
       case 'veterinario': return 'Veterinario';
       case 'recepcionista': return 'Recepcionista';
       case 'cliente': return 'Cliente';

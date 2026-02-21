@@ -107,7 +107,7 @@ export class EditCitasPage {
         (users || []).forEach(u => this.usuariosById.set(u.idUsuario, u));
 
         this.veterinarios = (users || []).filter(u => u.rol === 'veterinario');
-        this.programadores = (users || []).filter(u => u.rol === 'administrador' || u.rol === 'recepcionista');
+        this.programadores = (users || []).filter(u => u.rol === 'administrativo' || u.rol === 'recepcionista');
 
         // 2) animales
         this.animalService.getAnimales().subscribe({

@@ -59,7 +59,7 @@ export class EditProductosPage {
 
   // ✅ Solo admin puede editar "campos sensibles" de producto
   get canEditarCamposBase(): boolean {
-    return this.permisos.role() === 'administrador';
+    return this.permisos.role() === 'administrativo';
   }
 
   ionViewWillEnter() {

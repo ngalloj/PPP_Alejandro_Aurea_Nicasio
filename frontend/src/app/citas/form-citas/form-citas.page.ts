@@ -87,7 +87,7 @@ export class FormCitasPage {
         this.veterinarios = users.filter(u => u.rol === 'veterinario');
 
         // programadores (quien asigna): admin/recep por defecto
-        this.programadores = users.filter(u => u.rol === 'administrador' || u.rol === 'recepcionista');
+        this.programadores = users.filter(u => u.rol === 'administrativo' || u.rol === 'recepcionista');
 
         // 2) animales
         // OJO: si tu método se llama distinto, cámbialo aquí:

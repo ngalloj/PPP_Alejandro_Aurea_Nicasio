@@ -35,7 +35,7 @@ export class EditUsuarioPage {
     contrasena: '',
   };
 
-  roles: Role[] = ['administrador', 'veterinario', 'recepcionista', 'cliente'];
+  roles: Role[] = ['administrativo', 'veterinario', 'recepcionista', 'cliente'];
 
   constructor(
     private route: ActivatedRoute,
@@ -88,7 +88,7 @@ canEditarUsuarioTarget(): boolean {
 
   // Mostrar selector de rol SOLO si admin
   get canEditarRol(): boolean {
-    return this.role === 'administrador';
+    return this.role === 'administrativo';
   }
 
 ionViewWillEnter() {

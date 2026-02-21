@@ -1,4 +1,4 @@
-export type Role = 'administrador' | 'veterinario' | 'recepcionista' | 'cliente';
+export type Role = 'administrativo' | 'veterinario' | 'recepcionista' | 'cliente';
 
 export type Recurso =
   | 'usuarios'
@@ -54,7 +54,7 @@ function citaAtendida(ctx: Ctx): boolean {
  */
 export function can(role: Role, recurso: Recurso, accion: Accion, ctx: Ctx = {}): boolean {
   // ADMIN: todo
-  if (role === 'administrador') return true;
+  if (role === 'administrativo') return true;
 
   // =========================
   // RECEPCIONISTA
@@ -207,7 +207,7 @@ export function can(role: Role, recurso: Recurso, accion: Accion, ctx: Ctx = {})
  */
 export function canField(role: Role, field: Field, accion: Accion, ctx: Ctx = {}): boolean {
   // admin: todo
-  if (role === 'administrador') return true;
+  if (role === 'administrativo') return true;
 
   if (accion !== 'editar') return true;
 
