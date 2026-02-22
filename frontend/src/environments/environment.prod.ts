@@ -1,7 +1,7 @@
 // src/environments/environment.prod.ts
 // ----------------------------------------------------------
-// Configuración para PRODUCCIÓN (build que subes a Netlify)
-// Apunta al backend desplegado en Render
+// Configuración para PRODUCCIÓN (Netlify).
+// Apunta al backend desplegado en Render.
 // ----------------------------------------------------------
 
 export const environment = {

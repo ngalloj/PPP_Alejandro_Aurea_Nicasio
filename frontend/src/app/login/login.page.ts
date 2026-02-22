@@ -1,4 +1,8 @@
 // src/app/login/login.page.ts
+// ----------------------------------------------------------
+// Página de login: usa AuthService.login() y navega a /menu
+// cuando hay access_token en la respuesta.
+// ----------------------------------------------------------
 
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
@@ -30,6 +34,7 @@ export class LoginPage {
         this.loading = false;
         console.log('LOGIN RESPONSE =>', response);
 
+        // El backend devuelve access_token, no token
         if (response?.access_token) {
           this.router.navigate(['/menu']);
         } else {
