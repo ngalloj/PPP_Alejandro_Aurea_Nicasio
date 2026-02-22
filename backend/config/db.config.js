@@ -18,12 +18,14 @@ module.exports = {
 
 require('dotenv').config();
 
+// Configuración BD (Render + Aiven)
 module.exports = {
   HOST: process.env.DB_HOST,
   USER: process.env.DB_USER,
   PASSWORD: process.env.DB_PASSWORD,
   DB: process.env.DB_NAME,
   dialect: "mysql",
+  port: process.env.DB_PORT,      // añade esto para que use el puerto 10529
   pool: {
     max: 25,
     min: 0,
