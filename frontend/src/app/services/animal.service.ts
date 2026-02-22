@@ -1,13 +1,6 @@
-// src/app/services/animal.service.ts
-// ----------------------------------------------------------
-// Servicio de animales: todas las llamadas pasan por environment.apiUrl
-// y llevan el token en Authorization cuando hace falta.
-// ----------------------------------------------------------
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
 export type SexoAnimal = 'M' | 'H';
@@ -59,11 +52,7 @@ export interface UpdateAnimalDto {
 
 @Injectable({ providedIn: 'root' })
 export class AnimalService {
-  /**
-   * Dev:  http://localhost:8080/api/animal
-   * Prod: https://ppp-alejandro-aurea-nicasio.onrender.com/api/animal
-   */
-  private apiUrl = `${environment.apiUrl}/animal`;
+  private apiUrl = 'http://localhost:8080/api/animal';
 
   constructor(
     private http: HttpClient,

@@ -1,12 +1,6 @@
-// src/app/login/login.page.ts
-// ----------------------------------------------------------
-// Página de login: usa AuthService.login() y navega a /menu
-// cuando hay access_token en la respuesta.
-// ----------------------------------------------------------
-
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService, LoginResponse } from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -25,28 +19,26 @@ export class LoginPage {
     private authService: AuthService
   ) {}
 
-  login(): void {
+  login() {
     this.loading = true;
     this.errorMsg = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: (response: LoginResponse) => {
+      next: (response) => {
         this.loading = false;
-        console.log('LOGIN RESPONSE =>', response);
 
-        // El backend devuelve access_token, no token
         if (response?.access_token) {
+          this.authService.saveSession(response);
           this.router.navigate(['/menu']);
         } else {
           this.errorMsg = 'Respuesta inesperada del servidor.';
         }
       },
-      error: (error: any) => {
+      error: (error) => {
         this.loading = false;
-        console.error('LOGIN ERROR =>', error);
         this.errorMsg =
-          error?.error?.message || 'Credenciales incorrectas o error de red.';
-      },
+          error.error?.message || 'Credenciales incorrectas o error de red.';
+      }
     });
   }
 }

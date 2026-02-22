@@ -1,117 +1,64 @@
-// src/app/services/auth.service.ts
-// ----------------------------------------------------------
-// Servicio de autenticación:
-// - login() contra /api/usuario/signin
-// - guarda access_token + usuario en localStorage
-// - expone getUser(), getUserRole(), getUserId(), authHeaders(), getUsuarios()
-// ----------------------------------------------------------
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { Role, Usuario } from './usuario.service';
+import { Observable} from 'rxjs';
 
-// Respuesta de login tal y como la devuelve tu backend
-// {
-//   "usuario": { ... },
-//   "access_token": "eyJhbGciOiJI..."
-// }
 export interface LoginResponse {
+  usuario: {
+    idUsuario?: number;
+    email?: string;
+    rol?: string;
+    nombre?: string;
+  };
   access_token: string;
-  usuario: Usuario;
 }
-
-// Claves para localStorage
-const TOKEN_KEY = 'token';
-const USER_KEY = 'user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  /** 
-   * En dev:  http://localhost:8080/api/usuario/signin
-   * En prod: https://ppp-alejandro-aurea-nicasio.onrender.com/api/usuario/signin
-   */
-  private loginUrl = `${environment.apiUrl}/usuario/signin`;
+  // Ajusta host/puerto a tu backend real
+  private apiUrl = 'http://localhost:8080/api/usuario';
+
+  private tokenKey = 'access_token';
+  private userKey = 'usuario';
 
   constructor(private http: HttpClient) {}
 
-  // -------------------------
-  // LOGIN
-  // -------------------------
-  login(email: string, contrasena: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.loginUrl, { email, contrasena }).pipe(
-      tap((res: LoginResponse) => this.saveSession(res))
-    );
+  login(email: string, password: string): Observable<LoginResponse> {
+    // el backend espera "contrasena"
+    const body = { email, contrasena: password };
+    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
   }
 
-  // Guarda token + usuario en localStorage
-  saveSession(response: LoginResponse): void {
-    if (response?.access_token) {
-      localStorage.setItem(TOKEN_KEY, response.access_token);
-    }
-    if (response?.usuario) {
-      localStorage.setItem(USER_KEY, JSON.stringify(response.usuario));
-    }
+  saveSession(resp: LoginResponse) {
+    localStorage.setItem(this.tokenKey, resp.access_token);
+    localStorage.setItem(this.userKey, JSON.stringify(resp.usuario));
   }
 
-  // -------------------------
-  // ACCESO A TOKEN/USUARIO
-  // -------------------------
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(this.tokenKey);
   }
 
-  getUser(): Usuario | null {
-    const raw = localStorage.getItem(USER_KEY);
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as Usuario;
-    } catch {
-      return null;
-    }
+  getUser(): any | null {
+    const raw = localStorage.getItem(this.userKey);
+    return raw ? JSON.parse(raw) : null;
   }
 
-  getUserRole(): Role | null {
+  getUserRole(): string | null {
     return this.getUser()?.rol ?? null;
   }
 
-  getUserId(): number {
-    return Number(this.getUser()?.idUsuario ?? 0);
+  logout() {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
   }
 
-  // -------------------------
-  // CABECERAS AUTH
-  // -------------------------
+  // Para endpoints protegidos: añade Authorization: Bearer <token>
   authHeaders(): HttpHeaders {
     const token = this.getToken();
-    const headers: any = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    return new HttpHeaders(headers);
+    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  // -------------------------
-  // Helpers
-  // -------------------------
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
-
-  logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-  }
-
-  /**
-   * Helper para componentes que usaban this.auth.getUsuarios().
-   * Devuelve la lista de usuarios desde /api/usuario (requiere token).
-   */
-  getUsuarios(): Observable<Usuario[]> {
-    const url = `${environment.apiUrl}/usuario`;
-    return this.http.get<Usuario[]>(url, {
-      headers: this.authHeaders(),
-    });
+  // Ejemplo: pedir usuarios (ruta protegida)
+  getUsuarios() {
+    return this.http.get(`${this.apiUrl}`, { headers: this.authHeaders() });
   }
 }
