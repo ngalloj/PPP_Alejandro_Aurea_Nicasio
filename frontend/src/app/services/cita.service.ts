@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
-
 
 export type EstadoCita = 'pendiente' | 'confirmada' | 'atendida' | 'cancelada';
 
@@ -64,8 +62,7 @@ export interface UpdateCitaDto {
 
 @Injectable({ providedIn: 'root' })
 export class CitaService {
-  //private apiUrl = 'http://localhost:8080/api/cita';
-  private apiUrl = environment.apiUrl;
+  private apiUrl = 'http://localhost:8080/api/cita';
 
   constructor(
     private http: HttpClient,

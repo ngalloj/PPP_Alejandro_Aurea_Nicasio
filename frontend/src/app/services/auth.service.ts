@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable} from 'rxjs';
-import { environment } from '../../environments/environment';
 
 export interface LoginResponse {
   usuario: {
@@ -16,9 +15,8 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   // Ajusta host/puerto a tu backend real
-  //private apiUrl = 'http://localhost:8080/api/usuario';
-  private apiUrl = environment.apiUrl;
- 
+  private apiUrl = 'http://localhost:8080/api/usuario';
+
   private tokenKey = 'access_token';
   private userKey = 'usuario';
 
@@ -27,13 +25,8 @@ export class AuthService {
   login(email: string, password: string): Observable<LoginResponse> {
     // el backend espera "contrasena"
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.apiUrl}/usuario/signin`, body);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
   }
-
-  signin(data: any) {
-    return this.http.post(`${this.apiUrl}/usuario/signin`, data);
-  }
-
 
   saveSession(resp: LoginResponse) {
     localStorage.setItem(this.tokenKey, resp.access_token);

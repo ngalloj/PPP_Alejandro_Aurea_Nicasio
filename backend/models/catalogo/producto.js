@@ -2,15 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Producto = sequelize.define('Producto', {
-    //idElemento: { type: DataTypes.INTEGER, primaryKey: true },
-    idElemento: {
-      type: DataTypes.INTEGER,
-      allowNull: false,  // ← Solo esto
-      references: {
-        model: 'ELEMENTOS',
-        key: 'idElemento'
-      }
-    }, // Added closing brace here
+    idElemento: { type: DataTypes.INTEGER, primaryKey: true },
     stock: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     stockMinimo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     tipo: {

@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
-
 
 export interface LineaFactura {
   idLineaFactura: number;
@@ -43,7 +41,6 @@ export interface UpdateLineaFacturaDto {
 @Injectable({ providedIn: 'root' })
 export class LineaFacturaService {
   private baseUrl = 'http://localhost:8080/api/lineaFactura';
-  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

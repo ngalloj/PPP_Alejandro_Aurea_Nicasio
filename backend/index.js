@@ -22,23 +22,12 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// var corsOptions = {
-//   origin:"http://localhost:8100"
-// };
-const corsOptions = {
-  origin: ['http://localhost:4200', 'http://localhost:8100'],  // ← AMBOS
+var corsOptions = {
+  origin: true,
   credentials: true
 };
 // Se indica que solo se admiten peticiones de este frontend (se deja abierto)
-// app.use(cors(corsOptions));
-app.use(cors({
-  origin: [
-    'http://localhost:4200', 
-    'http://localhost:8100',
-    'https://clinicaveterinariappp2026v2.netlify.app'  // ← AÑADE ESTO
-  ],
-  credentials: true
-}));
+app.use(cors(corsOptions));
 
 
 // permite leer JSON en el body de la petición
@@ -46,9 +35,6 @@ app.use(express.json());
 
 // parsea datos enviados por formularios HTML
 app.use(express.urlencoded({ extended: true }));
-
-app.use(cors({ origin: true, credentials: true }));
-
 
 
 //Se importa el modelo 
@@ -63,8 +49,6 @@ const FORCE_SYNC = process.env.DB_FORCE_SYNC ==='true';
 const adminPass = process.env.DEFAULT_ADMIN_PASSWORD;
 
 // Se inicializa el modelo (si se decomenta force:true se reinicia el modelo con la correspondiente perdida de información )
-//db.sequelize.sync({ force: FORCE_SYNC}).then(async () => {
-//db.sequelize.sync({ alter: true}).then(async () => {
 db.sequelize.sync().then(async () => {
   console.log("Drop and re-sync db.");
 
