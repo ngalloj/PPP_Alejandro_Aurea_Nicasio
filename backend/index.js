@@ -45,7 +45,13 @@ const corsOptions = {
 // Aplica CORS globalmente
 app.use(cors(corsOptions));
 // Responde también a las peticiones OPTIONS (preflight) con las cabeceras CORS
-app.options('*', cors(corsOptions));
+//app.options('*', cors(corsOptions));
+// Opción 1: limitar a /api (suficiente para tu backend)
+app.options('/api/*', cors(corsOptions));
+
+// Opción 2: solo login, si quieres ser ultra explícito
+// app.options('/api/usuarios/login', cors(corsOptions));
+
 
 // sirve archivos estáticos (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
