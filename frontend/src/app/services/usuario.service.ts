@@ -1,7 +1,14 @@
+// src/app/services/usuario.service.ts
+// ----------------------------------------------------------
+// Servicio de usuarios: CRUD contra el backend
+// Usa environment.apiUrl para apuntar a local o Render
+// ----------------------------------------------------------
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export type Role = 'administrador' | 'veterinario' | 'recepcionista' | 'cliente';
 
@@ -56,7 +63,12 @@ export interface UpdateUsuarioDto {
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:8080/api/usuario';
+  /**
+   * URL base de usuarios.
+   * En desarrollo:  http://localhost:8080/api/usuario
+   * En producción:  https://ppp-alejandro-aurea-nicasio.onrender.com/api/usuario
+   */
+  private apiUrl = `${environment.apiUrl}/usuario`;
 
   constructor(
     private http: HttpClient,

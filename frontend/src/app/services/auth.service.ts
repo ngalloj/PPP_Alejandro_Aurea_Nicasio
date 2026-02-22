@@ -1,69 +1,51 @@
+// src/app/services/auth.service.ts
+// ----------------------------------------------------------
+// Servicio de autenticación: login y gestión de token
+// ----------------------------------------------------------
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable} from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-
-export interface LoginResponse {
-  usuario: {
-    idUsuario?: number;
-    email?: string;
-    rol?: string;
-    nombre?: string;
-  };
-  access_token: string;
+interface LoginResponse {
+  token: string;
+  // aquí puedes añadir usuario, rol, etc. según devuelva el backend
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Ajusta host/puerto a tu backend real
-  // private apiUrl = 'http://localhost:8080/api/usuario';
-  private baseUrl = environment.apiUrl;
-
-
-  private tokenKey = 'access_token';
-  private userKey = 'usuario';
+  /** En dev:  http://localhost:8080/api/usuario/signin
+   *  En prod: https://ppp-alejandro-aurea-nicasio.onrender.com/api/usuario/signin
+   */
+  private loginUrl = `${environment.apiUrl}/usuario/signin`;
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    // el backend espera "contrasena"
-    const body = { email, contrasena: password };
-    //return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
-    return this.http.post<LoginResponse>(`${this.baseUrl}/api/usuarios/login`, body);
+  /** Hace login contra el backend */
+  login(email: string, contrasena: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(this.loginUrl, { email, contrasena }).pipe(
+      tap(res => {
+        if (res && res.token) {
+          localStorage.setItem('token', res.token);
+        }
+      })
+    );
   }
 
-  saveSession(resp: LoginResponse) {
-    localStorage.setItem(this.tokenKey, resp.access_token);
-    localStorage.setItem(this.userKey, JSON.stringify(resp.usuario));
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
-
-  getUser(): any | null {
-    const raw = localStorage.getItem(this.userKey);
-    return raw ? JSON.parse(raw) : null;
-  }
-
-  getUserRole(): string | null {
-    return this.getUser()?.rol ?? null;
-  }
-
-  logout() {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.userKey);
-  }
-
-  // Para endpoints protegidos: añade Authorization: Bearer <token>
+  /** Devuelve cabeceras con Authorization: Bearer <token> */
   authHeaders(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
+    const token = localStorage.getItem('token') || '';
+    return new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+    });
   }
 
-  // Ejemplo: pedir usuarios (ruta protegida)
-  getUsuarios() {
-    return this.http.get(`${this.baseUrl}`, { headers: this.authHeaders() });
+  logout(): void {
+    localStorage.removeItem('token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
   }
 }
