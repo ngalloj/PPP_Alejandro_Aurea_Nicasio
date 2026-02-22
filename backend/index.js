@@ -77,7 +77,6 @@ const adminPass = process.env.DEFAULT_ADMIN_PASSWORD;
 db.sequelize.sync({ alter: false }).then(async () => {
   console.log("DB sync OK (sin recrear tablas).");
 
-  //Se crea un usuario administrador basico en el caso vaciar la base de datos. 
   if (FORCE_SYNC) {
     const hashedPassword = await bcrypt.hash(adminPass, 10);
 
@@ -94,6 +93,7 @@ db.sequelize.sync({ alter: false }).then(async () => {
     console.log("Usuario administrador creado");
   }
 });
+
 
 
 // Middleware global que inspecciona el header Authorization y gestiona autenticación Basic y JWT
