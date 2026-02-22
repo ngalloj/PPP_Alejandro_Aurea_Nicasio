@@ -73,9 +73,9 @@ const bcrypt = require('bcryptjs');
 const FORCE_SYNC = process.env.DB_FORCE_SYNC === 'true';
 const adminPass = process.env.DEFAULT_ADMIN_PASSWORD;
 
-// Se inicializa el modelo (si se decomenta force:true se reinicia el modelo con la correspondiente perdida de información )
-db.sequelize.sync().then(async () => {
-  console.log("Drop and re-sync db.");
+// Se inicializa el modelo (en producción NO se recrea el esquema)
+db.sequelize.sync({ alter: false }).then(async () => {
+  console.log("DB sync OK (sin recrear tablas).");
 
   //Se crea un usuario administrador basico en el caso vaciar la base de datos. 
   if (FORCE_SYNC) {
@@ -94,6 +94,7 @@ db.sequelize.sync().then(async () => {
     console.log("Usuario administrador creado");
   }
 });
+
 
 // Middleware global que inspecciona el header Authorization y gestiona autenticación Basic y JWT
 app.use((req, res, next) => {
