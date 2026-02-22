@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService, LoginResponse } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -24,11 +24,12 @@ export class LoginPage {
     this.errorMsg = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: (response) => {
+      next: (response: LoginResponse) => {
         this.loading = false;
 
-        if (response?.access_token) {
-          this.authService.saveSession(response);
+        // login() ya llama a saveSession(response) en el propio servicio,
+        // así que aquí solo comprobamos que haya token y navegamos.
+        if (response?.token) {
           this.router.navigate(['/menu']);
         } else {
           this.errorMsg = 'Respuesta inesperada del servidor.';
@@ -38,7 +39,7 @@ export class LoginPage {
         this.loading = false;
         this.errorMsg =
           error.error?.message || 'Credenciales incorrectas o error de red.';
-      }
+      },
     });
   }
 }
