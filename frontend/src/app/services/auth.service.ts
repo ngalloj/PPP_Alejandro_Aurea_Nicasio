@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable} from 'rxjs';
+import { environment } from 'src/environments/environment';
+
 
 export interface LoginResponse {
   usuario: {
@@ -15,7 +17,9 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   // Ajusta host/puerto a tu backend real
-  private apiUrl = 'http://localhost:8080/api/usuario';
+  // private apiUrl = 'http://localhost:8080/api/usuario';
+  private baseUrl = environment.apiUrl;
+
 
   private tokenKey = 'access_token';
   private userKey = 'usuario';
@@ -25,7 +29,8 @@ export class AuthService {
   login(email: string, password: string): Observable<LoginResponse> {
     // el backend espera "contrasena"
     const body = { email, contrasena: password };
-    return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
+    //return this.http.post<LoginResponse>(`${this.apiUrl}/signin`, body);
+    return this.http.post<LoginResponse>(`${this.baseUrl}/api/usuarios/login`, body);
   }
 
   saveSession(resp: LoginResponse) {
@@ -59,6 +64,6 @@ export class AuthService {
 
   // Ejemplo: pedir usuarios (ruta protegida)
   getUsuarios() {
-    return this.http.get(`${this.apiUrl}`, { headers: this.authHeaders() });
+    return this.http.get(`${this.baseUrl}`, { headers: this.authHeaders() });
   }
 }
