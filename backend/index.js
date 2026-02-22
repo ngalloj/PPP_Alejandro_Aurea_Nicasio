@@ -22,12 +22,33 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-var corsOptions = {
+/* var corsOptions = {
   origin: true,
   credentials: true
 };
 // Se indica que solo se admiten peticiones de este frontend (se deja abierto)
+app.use(cors(corsOptions)); */
+
+const allowedOrigins = [
+  'http://localhost:4200',
+  'http://localhost:8100',
+  'https://serverclinvet.netlify.app',
+  'https://serverclinvetlts.netlify.app'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Postman, curl, etc.
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+};
+
 app.use(cors(corsOptions));
+
 
 
 // permite leer JSON en el body de la petición
