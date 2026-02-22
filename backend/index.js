@@ -44,14 +44,14 @@ const corsOptions = {
 
 // Aplica CORS globalmente
 app.use(cors(corsOptions));
-// Responde también a las peticiones OPTIONS (preflight) con las cabeceras CORS
-//app.options('*', cors(corsOptions));
-// Opción 1: limitar a /api (suficiente para tu backend)
-app.options('/api/*', cors(corsOptions));
 
-// Opción 2: solo login, si quieres ser ultra explícito
-// app.options('/api/usuarios/login', cors(corsOptions));
-
+// Manejar preflight OPTIONS para cualquier ruta sin usar patrones que rompan path-to-regexp
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return cors(corsOptions)(req, res, next);
+  }
+  return next();
+});
 
 // sirve archivos estáticos (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -122,6 +122,7 @@ app.use((req, res, next) => {
     const token = authHeader.replace('Bearer ', '');
 
     jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+
       //corta el pipeline si hay un error 
       if (err) {
         return res.status(401).json({
