@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     foto: { type: DataTypes.STRING(255), allowNull: true }
   }, {
-    tableName: 'PRODUCTOS',
+    tableName: 'productos',
     timestamps: false
   });
 

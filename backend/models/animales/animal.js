@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     foto: { type: DataTypes.STRING(255), allowNull: true },
     idUsuario: { type: DataTypes.INTEGER, allowNull: false }
   }, {
-    tableName: 'ANIMALES',
+    tableName: 'animales',
     timestamps: false
   });
 

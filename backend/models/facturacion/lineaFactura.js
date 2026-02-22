@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     idElemento: { type: DataTypes.INTEGER, allowNull: false },
     idUsuario_creador: { type: DataTypes.INTEGER, allowNull: false }
   }, {
-    tableName: 'LINEAS_FACTURA',
+    tableName: 'lineas_facturas',
     timestamps: false
   });
 
