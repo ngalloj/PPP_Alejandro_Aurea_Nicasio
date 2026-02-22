@@ -55,13 +55,16 @@ export interface UpdateProductoDto {
   foto?: string | null;
 }
 
+import { environment } from '../../environments/environment'; // Add this import
+
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
   /**
    * Dev:  http://localhost:8080/api/producto
    * Prod: https://ppp-alejandro-aurea-nicasio.onrender.com/api/producto
    */
-  private apiUrl = `${environment.apiUrl}/producto`;
+  
+    private apiUrl = `${environment.apiUrl}/producto`;
 
   constructor(
     private http: HttpClient,
