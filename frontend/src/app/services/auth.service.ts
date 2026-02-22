@@ -22,7 +22,7 @@ export class AuthService {
 
   login(email: string, contrasena: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(this.loginUrl, { email, contrasena }).pipe(
-      tap(res => this.saveSession(res))
+      tap((res: LoginResponse) => this.saveSession(res))
     );
   }
 
