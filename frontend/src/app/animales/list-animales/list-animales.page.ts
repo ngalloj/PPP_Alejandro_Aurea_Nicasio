@@ -189,10 +189,16 @@ export class ListAnimalesPage {
 
   // FOTO DEL ANIMAL
   getAnimalFotoUrl(a: Animal): string {
-    if (!a.foto) {
+    if (!a?.foto) {
       return 'assets/No-Image-Placeholder.svg';
     }
-    const baseBackend = environment.apiUrl.replace('/api', '');
-    return `${baseBackend}/images/${a.foto}`;
+  
+    // Si ya es URL absoluta (Cloudinary, etc.), la devolvemos tal cual
+    if (a.foto.startsWith('http://') || a.foto.startsWith('https://')) {
+      return a.foto;
+    }
+  
+    // Modo antiguo: backend sirviendo /images/<nombre>
+    return `https://ppp-alejandro-aurea-nicasio.onrender.com/images/${a.foto}`;
   }
 }

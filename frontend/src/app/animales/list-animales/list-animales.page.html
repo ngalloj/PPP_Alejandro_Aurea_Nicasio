@@ -92,6 +92,7 @@
         <ion-list class="animals-list" *ngIf="!loading">
           <ion-item class="animal-item" lines="none" *ngFor="let a of animalesFiltrados">
 
+            <!-- AVATAR CORREGIDO -->
             <ion-avatar class="animal-avatar" slot="start">
               <img
                 *ngIf="a.foto; else placeholder"
@@ -104,6 +105,7 @@
                 </div>
               </ng-template>
             </ion-avatar>
+            <!-- FIN AVATAR -->
 
             <ion-label class="ion-text-wrap">
               <h2>{{ a.nombre }}</h2>
