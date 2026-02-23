@@ -138,7 +138,7 @@ export class EditAnimalesPage {
 
   private rellenarFormDesdeAnimal() {
     if (!this.animal) return;
-
+  
     this.form = {
       nombre: this.animal.nombre ?? '',
       especie: this.animal.especie ?? '',
@@ -147,20 +147,31 @@ export class EditAnimalesPage {
       sexo: this.animal.sexo ?? null,
       observaciones: this.animal.observaciones ?? '',
       idUsuario: this.animal.idUsuario ?? undefined,
+      foto: this.animal.foto ?? '',
     };
-
+  
     if (this.animal.foto) {
-      const baseBackend = environment.apiUrl.replace('/api', '');
-      const url = `${baseBackend}/images/${this.animal.foto}`;
-      this.originalPhoto = url;
-      this.capturedPhoto = url;
+      const foto = this.animal.foto as string;
+  
+      if (foto.startsWith('http://') || foto.startsWith('https://')) {
+        // URL absoluta (Cloudinary, etc.)
+        this.originalPhoto = foto;
+        this.capturedPhoto = foto;
+      } else {
+        // Foto antigua servida por tu backend
+        const baseBackend = environment.apiUrl.replace('/api', '');
+        const url = `${baseBackend}/images/${foto}`;
+        this.originalPhoto = url;
+        this.capturedPhoto = url;
+      }
     } else {
       this.originalPhoto = '';
       this.capturedPhoto = '';
     }
-
+  
     this.removeImage = false;
   }
+  
 
   ownerLabelById(idUsuario: number | null | undefined): string {
     if (!idUsuario) return '-';
