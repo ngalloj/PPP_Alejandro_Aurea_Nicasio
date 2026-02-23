@@ -11,9 +11,12 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 // Se importa path , para trabajar con rutas sin tener en cuenta el sistema operativo
 const path = require('path');
-
 //se instalacia express
 const app = express();
+
+// se importa cloudinary para gestionar las imágenes
+const cloudinary = require('cloudinary').v2;
+
 
 /**
  * CORS
@@ -166,3 +169,12 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+
+// Configuración de Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
