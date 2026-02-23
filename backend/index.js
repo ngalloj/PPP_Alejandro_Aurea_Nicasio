@@ -21,11 +21,13 @@ const app = express();
  * Se definen explícitamente los orígenes permitidos (local y Netlify)
  * y se aplica el middleware CORS ANTES que el resto de middlewares/rutas.
  */
+// Orígenes permitidos: 
 const allowedOrigins = [
-  'http://localhost:4200',
   'http://localhost:8100',
-  'https://serverclinvet.netlify.app',
-  'https://serverclinvetlts.netlify.app'
+  'http://localhost:4200',
+  'http://localhost:8080',
+  'https://clinica-veterinaria-pages.pages.dev',
+  'https://clinica-veterinaria.netlify.app'
 ];
 
 const corsOptions = {
