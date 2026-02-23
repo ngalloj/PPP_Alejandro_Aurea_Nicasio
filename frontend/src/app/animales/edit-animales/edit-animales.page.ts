@@ -154,11 +154,11 @@ export class EditAnimalesPage {
       const foto = this.animal.foto as string;
   
       if (foto.startsWith('http://') || foto.startsWith('https://')) {
-        // URL absoluta (Cloudinary, etc.)
+        // URL absoluta: Cloudinary
         this.originalPhoto = foto;
         this.capturedPhoto = foto;
       } else {
-        // Foto antigua servida por tu backend
+        // Nombre de archivo antiguo servido por tu backend
         const baseBackend = environment.apiUrl.replace('/api', '');
         const url = `${baseBackend}/images/${foto}`;
         this.originalPhoto = url;
@@ -171,6 +171,7 @@ export class EditAnimalesPage {
   
     this.removeImage = false;
   }
+  
   
 
   ownerLabelById(idUsuario: number | null | undefined): string {
