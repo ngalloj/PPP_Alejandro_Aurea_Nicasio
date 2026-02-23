@@ -140,13 +140,14 @@ export class ListProductosPage {
   
     const foto: string = p.foto;
   
-    // URL absoluta (Cloudinary, etc.)
+    // Si ya es URL absoluta (Cloudinary, etc.), NO añadir /images
     if (foto.startsWith('http://') || foto.startsWith('https://')) {
       return foto;
     }
   
-    // Formato antiguo: solo nombre de archivo en tu backend
+    // Formato antiguo: solo nombre de archivo que sirve tu backend
     return `https://ppp-alejandro-aurea-nicasio.onrender.com/images/${foto}`;
   }
+  
   
 }

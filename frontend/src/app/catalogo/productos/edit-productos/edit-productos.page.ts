@@ -193,7 +193,7 @@ export class EditProductosPage {
 
   private precargarFormDesdeProducto(p: Producto) {
     const el = (p as any).Elemento || (p as any).elemento || null;
-
+  
     this.form = {
       nombre: el?.nombre ?? '',
       descripcion: el?.descripcion ?? '',
@@ -201,19 +201,31 @@ export class EditProductosPage {
       tipo: p.tipo ?? 'medicamento',
       stock: p.stock ?? 0,
       stockMinimo: p.stockMinimo ?? 0,
+      foto: p.foto ?? '',
     };
-
+  
     if (p.foto) {
-      const baseBackend = environment.apiUrl.replace('/api', '');
-      const url = `${baseBackend}/images/${p.foto}`;
-      this.originalPhoto = url;
-      this.capturedPhoto = url;
+      const foto = p.foto as string;
+  
+      // Si ya es URL absoluta (Cloudinary), úsala tal cual
+      if (foto.startsWith('http://') || foto.startsWith('https://')) {
+        this.originalPhoto = foto;
+        this.capturedPhoto = foto;
+      } else {
+        // Formato antiguo: nombre de archivo servido por tu backend
+        const baseBackend = environment.apiUrl.replace('/api', '');
+        const url = `${baseBackend}/images/${foto}`;
+        this.originalPhoto = url;
+        this.capturedPhoto = url;
+      }
     } else {
       this.originalPhoto = '';
       this.capturedPhoto = '';
     }
+  
     this.removeImage = false;
   }
+  
 
   // FOTO
 
