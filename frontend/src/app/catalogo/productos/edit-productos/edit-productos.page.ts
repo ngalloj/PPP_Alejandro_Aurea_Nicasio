@@ -207,16 +207,16 @@ export class EditProductosPage {
     if (p.foto) {
       const foto = p.foto as string;
   
-      // Si ya es URL absoluta (Cloudinary), úsala tal cual
       if (foto.startsWith('http://') || foto.startsWith('https://')) {
+        // Cloudinary u otra URL absoluta
         this.originalPhoto = foto;
         this.capturedPhoto = foto;
       } else {
-        // Formato antiguo: nombre de archivo servido por tu backend
+        // Nombre de archivo antiguo
         const baseBackend = environment.apiUrl.replace('/api', '');
-        const url = `${baseBackend}/images/${foto}`;
-        this.originalPhoto = url;
-        this.capturedPhoto = url;
+        //const url = `${baseBackend}/images/${foto}`;
+        //this.originalPhoto = url;
+        //this.capturedPhoto = url;
       }
     } else {
       this.originalPhoto = '';
@@ -225,6 +225,7 @@ export class EditProductosPage {
   
     this.removeImage = false;
   }
+  
   
 
   // FOTO
