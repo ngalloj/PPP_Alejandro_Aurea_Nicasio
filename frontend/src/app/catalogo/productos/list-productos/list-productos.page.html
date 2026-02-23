@@ -93,19 +93,19 @@
 
           <ion-item class="product-item" lines="none" *ngFor="let p of productosFiltrados">
 
-            <div class="avatar" slot="start" aria-hidden="true">
+            <ion-avatar class="product-avatar" slot="start">
               <img
-                *ngIf="p.foto; else placeholder"
-                class="avatar-img"
+                *ngIf="p.foto; else prodPlaceholder"
                 [src]="getProductoFotoUrl(p)"
                 alt="image"
               />
-              <ng-template #placeholder>
+              <ng-template #prodPlaceholder>
                 <div class="avatar-placeholder">
                   <ion-icon name="camera-outline"></ion-icon>
                 </div>
               </ng-template>
-            </div>
+            </ion-avatar>
+            
 
             <ion-label class="ion-text-wrap">
               <h2>{{ p.Elemento?.nombre || ('Producto #' + p.idElemento) }}</h2>

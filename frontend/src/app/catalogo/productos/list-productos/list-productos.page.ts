@@ -133,11 +133,20 @@ export class ListProductosPage {
   }
 
   // FOTO DEL PRODUCTO
-  getProductoFotoUrl(p: Producto): string {
-    if (!p.foto) {
+  getProductoFotoUrl(p: any): string {
+    if (!p || !p.foto) {
       return 'assets/No-Image-Placeholder.svg';
     }
-    const baseBackend = environment.apiUrl.replace('/api', '');
-    return `${baseBackend}/images/${p.foto}`;
+  
+    const foto: string = p.foto;
+  
+    // URL absoluta (Cloudinary, etc.)
+    if (foto.startsWith('http://') || foto.startsWith('https://')) {
+      return foto;
+    }
+  
+    // Formato antiguo: solo nombre de archivo en tu backend
+    return `https://ppp-alejandro-aurea-nicasio.onrender.com/images/${foto}`;
   }
+  
 }
