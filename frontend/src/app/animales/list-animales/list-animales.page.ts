@@ -3,13 +3,12 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-// OJO: aquí apunto a src/app/... para que TypeScript encuentre bien los módulos
 import { Animal, AnimalService } from 'src/app/services/animal.service';
 import { Usuario, UsuarioService } from 'src/app/services/usuario.service';
 
-// OJO: aquí están tus rutas reales
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-list-animales',
@@ -22,14 +21,11 @@ export class ListAnimalesPage {
   animales: Animal[] = [];
   animalesFiltrados: Animal[] = [];
 
-  // Mapa idUsuario -> "Nombre Apellidos"
   ownerNameById: Record<number, string> = {};
 
-  // Filtros
   filtroEspecie: string = 'todas';
   filtroTexto: string = '';
 
-  // UI state
   loading = false;
   errorMsg = '';
 
@@ -42,7 +38,6 @@ export class ListAnimalesPage {
   ) {}
 
   get canVer(): boolean {
-    // Cliente: permisos.ts exige ctx.esPropietario=true
     if (this.isCliente) {
       return this.permisos.can('animales', 'ver', { esPropietario: true });
     }
@@ -57,7 +52,6 @@ export class ListAnimalesPage {
     return this.permisos.can('animales', 'eliminar');
   }
 
-  // helpers rol/usuario
   get isCliente(): boolean {
     return (this.auth.getUserRole() || '') === 'cliente';
   }
@@ -67,7 +61,6 @@ export class ListAnimalesPage {
   }
 
   ionViewWillEnter(): void {
-    // guard de acceso
     if (!this.canVer) {
       this.router.navigate(['/menu']);
       return;
@@ -84,14 +77,12 @@ export class ListAnimalesPage {
     this.loading = true;
     this.errorMsg = '';
 
-    // Cargamos usuarios y animales
     this.usuarioService.getUsuarios().subscribe({
       next: (usuarios: Usuario[]) => {
         this.ownerNameById = this.buildOwnerMap(usuarios || []);
 
         this.animalService.getAnimales().subscribe({
           next: (animales: Animal[]) => {
-            // filtro por propietario si es cliente
             const all = (animales || []);
             this.animales = this.isCliente
               ? all.filter((a: Animal) => Number(a.idUsuario) === this.idUsuarioLogueado)
@@ -107,7 +98,6 @@ export class ListAnimalesPage {
         });
       },
       error: (err: any) => {
-        // Si falla usuarios, aún puedes listar animales pero sin nombre de propietario
         this.ownerNameById = {};
         this.animalService.getAnimales().subscribe({
           next: (animales: Animal[]) => {
@@ -144,7 +134,6 @@ export class ListAnimalesPage {
     return this.ownerNameById[idUsuario] || `Usuario ${idUsuario}`;
   }
 
-  // Para llenar el select de especies sin duplicados
   get especiesDisponibles(): string[] {
     const set = new Set<string>();
     for (const a of this.animales) {
@@ -176,7 +165,6 @@ export class ListAnimalesPage {
   }
 
   eliminarAnimal(animal: Animal): void {
-    // seguridad extra (aunque el botón no salga)
     if (!this.canEliminar) return;
 
     if (!confirm(`¿Seguro que quieres eliminar a ${animal.nombre}?`)) return;
@@ -197,5 +185,14 @@ export class ListAnimalesPage {
 
   volver(): void {
     this.router.navigate(['/menu']);
+  }
+
+  // FOTO DEL ANIMAL
+  getAnimalFotoUrl(a: Animal): string {
+    if (!a.foto) {
+      return 'assets/No-Image-Placeholder.svg';
+    }
+    const baseBackend = environment.apiUrl.replace('/api', '');
+    return `${baseBackend}/images/${a.foto}`;
   }
 }

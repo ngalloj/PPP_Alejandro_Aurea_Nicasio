@@ -1,3 +1,5 @@
+<!-- src/app/catalogo/productos/list-productos/list-productos.page.html -->
+
 <ion-header class="products-header">
   <ion-toolbar class="products-toolbar">
     <ion-buttons slot="start">
@@ -18,7 +20,6 @@
 <ion-content class="products-content">
   <div class="products-shell">
 
-    <!-- Cabecera de página -->
     <div class="page-head">
       <div class="page-head-left">
         <div class="page-icon" aria-hidden="true">
@@ -43,7 +44,6 @@
 
     <div class="products-layout">
 
-      <!-- Panel filtros -->
       <aside class="filters-panel">
         <div class="filters-card">
           <div class="filters-head">
@@ -63,7 +63,9 @@
             </ion-item>
 
             <ion-item class="field" lines="inset">
-              <ion-label position="floating">Buscar (nombre, descripción, id, precio, stock...)</ion-label>
+              <ion-label position="floating">
+                Buscar (nombre, descripción, id, precio, stock...)
+              </ion-label>
               <ion-input [(ngModel)]="filtroTexto" (ionInput)="aplicarFiltros()"></ion-input>
             </ion-item>
 
@@ -75,32 +77,27 @@
         </div>
       </aside>
 
-      <!-- Panel listado -->
       <section class="list-panel">
 
-        <!-- LOADING -->
         <div class="state-row" *ngIf="loading">
           <ion-spinner name="crescent"></ion-spinner>
           <span>Cargando productos…</span>
         </div>
 
-        <!-- ERROR -->
         <div class="error-card" *ngIf="errorMsg">
           <ion-icon name="alert-circle-outline"></ion-icon>
           <div class="ion-text-wrap">{{ errorMsg }}</div>
         </div>
 
-        <!-- LISTADO -->
         <ion-list class="products-list" *ngIf="!loading">
 
           <ion-item class="product-item" lines="none" *ngFor="let p of productosFiltrados">
 
-            <!-- Avatar -->
             <div class="avatar" slot="start" aria-hidden="true">
               <img
                 *ngIf="p.foto; else placeholder"
                 class="avatar-img"
-                src="http://localhost:8080/images/{{p.foto}}"
+                [src]="getProductoFotoUrl(p)"
                 alt="image"
               />
               <ng-template #placeholder>
@@ -129,7 +126,6 @@
               </div>
             </ion-label>
 
-            <!-- Acciones -->
             <div class="actions" slot="end">
               <ion-button
                 class="action-btn"
@@ -152,7 +148,6 @@
 
         </ion-list>
 
-        <!-- VACÍO -->
         <div class="empty-card" *ngIf="productosFiltrados.length === 0 && !loading && !errorMsg">
           <ion-icon name="search-outline"></ion-icon>
           <div class="ion-text-wrap">

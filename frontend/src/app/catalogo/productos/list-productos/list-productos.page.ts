@@ -1,8 +1,11 @@
+// src/app/catalogo/productos/list-productos/list-productos.page.ts
+
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductoService, Producto, ProductoTipo } from '../../../services/producto.service';
 
 import { PermisosService } from 'src/app/seguridad/permisos.service';
+import { environment } from 'src/environments/environment';
 
 type TipoFiltro = ProductoTipo | 'todos';
 
@@ -22,7 +25,6 @@ export class ListProductosPage {
   loading = false;
   errorMsg = '';
 
-  // para el select
   tipos: ProductoTipo[] = ['medicamento', 'material', 'alimentacion', 'complementos'];
 
   constructor(
@@ -44,7 +46,6 @@ export class ListProductosPage {
   }
 
   ionViewWillEnter() {
-    // ✅ protección de acceso a la vista (si alguien entra por URL)
     if (!this.canVer) {
       this.router.navigate(['/menu']);
       return;
@@ -105,7 +106,6 @@ export class ListProductosPage {
   }
 
   eliminarProducto(p: Producto) {
-    // ✅ doble-check (seguridad extra)
     if (!this.canEliminar) return;
 
     const nombre = p.Elemento?.nombre || `ID ${p.idElemento}`;
@@ -124,13 +124,20 @@ export class ListProductosPage {
   }
 
   crearProducto() {
-    // ✅ doble-check (seguridad extra)
     if (!this.canNuevo) return;
-
     this.router.navigate(['/form-productos']);
   }
 
-      volver() {
-    this.router.navigate(['/menu-catalogo']);  
+  volver() {
+    this.router.navigate(['/menu-catalogo']);
+  }
+
+  // FOTO DEL PRODUCTO
+  getProductoFotoUrl(p: Producto): string {
+    if (!p.foto) {
+      return 'assets/No-Image-Placeholder.svg';
+    }
+    const baseBackend = environment.apiUrl.replace('/api', '');
+    return `${baseBackend}/images/${p.foto}`;
   }
 }

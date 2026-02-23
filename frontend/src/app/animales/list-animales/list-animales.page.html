@@ -1,3 +1,5 @@
+<!-- src/app/animales/list-animales/list-animales.page.html -->
+
 <ion-header class="animals-header">
   <ion-toolbar class="animals-toolbar">
     <ion-buttons slot="start">
@@ -18,7 +20,6 @@
 <ion-content class="animals-content">
   <div class="animals-shell">
 
-    <!-- Encabezado de sección -->
     <div class="page-head">
       <div class="page-head-left">
         <div class="page-icon" aria-hidden="true">
@@ -43,7 +44,6 @@
 
     <div class="animals-layout">
 
-      <!-- Panel filtros -->
       <aside class="filters-panel">
         <div class="filters-card">
           <div class="filters-head">
@@ -77,29 +77,25 @@
         </div>
       </aside>
 
-      <!-- Listado -->
       <section class="list-panel">
 
-        <!-- LOADING -->
         <div class="state-row" *ngIf="loading">
           <ion-spinner name="crescent"></ion-spinner>
           <span>Cargando animales…</span>
         </div>
 
-        <!-- ERROR -->
         <div class="error-card" *ngIf="errorMsg">
           <ion-icon name="alert-circle-outline"></ion-icon>
           <div class="ion-text-wrap">{{ errorMsg }}</div>
         </div>
 
-        <!-- LISTADO -->
         <ion-list class="animals-list" *ngIf="!loading">
           <ion-item class="animal-item" lines="none" *ngFor="let a of animalesFiltrados">
 
             <ion-avatar class="animal-avatar" slot="start">
               <img
                 *ngIf="a.foto; else placeholder"
-                src="http://localhost:8080/images/{{a.foto}}"
+                [src]="getAnimalFotoUrl(a)"
                 alt="image"
               />
               <ng-template #placeholder>
@@ -128,7 +124,6 @@
               </div>
             </ion-label>
 
-            <!-- Acciones -->
             <div class="actions" slot="end">
               <ion-button
                 class="action-btn"
@@ -150,7 +145,6 @@
           </ion-item>
         </ion-list>
 
-        <!-- VACÍO -->
         <div class="empty-card" *ngIf="animalesFiltrados.length === 0 && !loading">
           <ion-icon name="search-outline"></ion-icon>
           <div class="ion-text-wrap">
