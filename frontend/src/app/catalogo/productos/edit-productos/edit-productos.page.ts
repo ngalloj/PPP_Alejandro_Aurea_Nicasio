@@ -1,3 +1,5 @@
+// src/app/catalogo/productos/edit-productos/edit-productos.page.ts
+
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -8,6 +10,8 @@ import {
 } from '../../../services/producto.service';
 
 import { PermisosService } from 'src/app/seguridad/permisos.service';
+import { PhotoService } from '../../../services/photo.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-edit-productos',
@@ -23,13 +27,10 @@ export class EditProductosPage {
 
   editMode = false;
 
-  // producto "completo" (incluye Elemento)
   producto: Producto | null = null;
 
-  // combos
   tipos: ProductoTipo[] = ['medicamento', 'material', 'alimentacion', 'complementos'];
 
-  // form para edición
   form: UpdateProductoDto = {
     nombre: '',
     descripcion: '',
@@ -42,11 +43,16 @@ export class EditProductosPage {
 
   private idElemento!: number;
 
+  capturedPhoto: string = '';
+  originalPhoto: string = '';
+  removeImage = false;
+
   constructor(
     private productoService: ProductoService,
     private route: ActivatedRoute,
     private router: Router,
-    private permisos: PermisosService
+    private permisos: PermisosService,
+    public photoService: PhotoService
   ) {}
 
   get canVer(): boolean {
@@ -57,7 +63,7 @@ export class EditProductosPage {
     return this.permisos.can('productos', 'editar');
   }
 
-  // ✅ Solo admin puede editar "campos sensibles" de producto
+  // Solo admin puede editar campos base
   get canEditarCamposBase(): boolean {
     return this.permisos.role() === 'administrador';
   }
@@ -114,7 +120,7 @@ export class EditProductosPage {
     if (this.producto) this.precargarFormDesdeProducto(this.producto);
   }
 
-  guardarCambios() {
+  async guardarCambios() {
     if (!this.producto) return;
     if (!this.canEditar) return;
 
@@ -122,21 +128,18 @@ export class EditProductosPage {
     this.errorMsg = '';
     this.okMsg = '';
 
-    // ✅ Admin: puede enviar todo
-    // ✅ No-admin (vet/recep): solo stock + foto
+    let blob: Blob | null = null;
+
     let payload: UpdateProductoDto;
 
     if (this.canEditarCamposBase) {
       payload = {
-        // Elemento
         nombre: (this.form.nombre || '').trim() || undefined,
         descripcion: (this.form.descripcion || '').trim() || undefined,
         precio:
           this.form.precio !== null && this.form.precio !== undefined
             ? Number(this.form.precio)
             : undefined,
-
-        // Producto
         tipo: this.form.tipo || undefined,
         stock:
           this.form.stock !== null && this.form.stock !== undefined
@@ -146,25 +149,31 @@ export class EditProductosPage {
           this.form.stockMinimo !== null && this.form.stockMinimo !== undefined
             ? Number(this.form.stockMinimo)
             : undefined,
-        foto: (this.form.foto || '').trim() || undefined,
       };
+      (payload as any).removeImage = this.removeImage;
     } else {
       payload = {
         stock:
           this.form.stock !== null && this.form.stock !== undefined
             ? Number(this.form.stock)
             : undefined,
-        foto: (this.form.foto || '').trim() || undefined,
       };
+      (payload as any).removeImage = this.removeImage;
     }
 
-    // limpiar undefined/'' para que viaje lo mínimo
+    if (!this.removeImage && this.capturedPhoto && this.capturedPhoto !== this.originalPhoto) {
+      const response = await fetch(this.capturedPhoto);
+      blob = await response.blob();
+    }
+
     Object.keys(payload).forEach((k) => {
       const key = k as keyof UpdateProductoDto;
-      if ((payload as any)[key] === undefined || (payload as any)[key] === '') delete (payload as any)[key];
+      if ((payload as any)[key] === undefined || (payload as any)[key] === '') {
+        delete (payload as any)[key];
+      }
     });
 
-    this.productoService.updateProducto(this.idElemento, payload).subscribe({
+    this.productoService.updateProducto(this.idElemento, payload, blob ?? undefined).subscribe({
       next: () => {
         this.saving = false;
         this.okMsg = 'Producto actualizado correctamente.';
@@ -184,16 +193,59 @@ export class EditProductosPage {
 
   private precargarFormDesdeProducto(p: Producto) {
     const el = (p as any).Elemento || (p as any).elemento || null;
-
+  
     this.form = {
       nombre: el?.nombre ?? '',
       descripcion: el?.descripcion ?? '',
       precio: el?.precio ?? 0,
-
       tipo: p.tipo ?? 'medicamento',
       stock: p.stock ?? 0,
       stockMinimo: p.stockMinimo ?? 0,
       foto: p.foto ?? '',
     };
+  
+    if (p.foto) {
+      const foto = p.foto as string;
+  
+      if (foto.startsWith('http://') || foto.startsWith('https://')) {
+        // Cloudinary u otra URL absoluta
+        this.originalPhoto = foto;
+        this.capturedPhoto = foto;
+      } else {
+        // Nombre de archivo antiguo
+        const baseBackend = environment.apiUrl.replace('/api', '');
+        //const url = `${baseBackend}/images/${foto}`;
+        //this.originalPhoto = url;
+        //this.capturedPhoto = url;
+      }
+    } else {
+      this.originalPhoto = '';
+      this.capturedPhoto = '';
+    }
+  
+    this.removeImage = false;
+  }
+  
+  
+
+  // FOTO
+
+  takePhoto() {
+    this.photoService.takePhoto().then(data => {
+      this.capturedPhoto = data.webPath ? data.webPath : '';
+      this.removeImage = false;
+    });
+  }
+
+  pickImage() {
+    this.photoService.pickImage().then(data => {
+      this.capturedPhoto = data.webPath;
+      this.removeImage = false;
+    });
+  }
+
+  discardImage() {
+    this.capturedPhoto = '';
+    this.removeImage = true;
   }
 }

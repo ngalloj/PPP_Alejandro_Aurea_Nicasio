@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     idHistorial: { type: DataTypes.INTEGER, allowNull: false },
     idUsuario: { type: DataTypes.INTEGER, allowNull: false }
   }, {
-    tableName: 'LINEAS_HISTORIAL',
+    tableName: 'lineas_historiales',
     timestamps: false
   });
 

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
+
 
 export type SexoAnimal = 'M' | 'H';
 
@@ -31,7 +33,7 @@ export interface CreateAnimalDto {
   Fechanac?: string | null; // "YYYY-MM-DD"
   sexo?: SexoAnimal | null;
   observaciones?: string | null;
-  foto?: string | null;
+
 }
 
 /**
@@ -52,7 +54,7 @@ export interface UpdateAnimalDto {
 
 @Injectable({ providedIn: 'root' })
 export class AnimalService {
-  private apiUrl = 'http://localhost:8080/api/animal';
+  private apiUrl = `${environment.apiUrl}/animal`;
 
   constructor(
     private http: HttpClient,
@@ -74,15 +76,70 @@ export class AnimalService {
   }
 
   /** POST /api/animal */
-  createAnimal(payload: CreateAnimalDto): Observable<Animal> {
-    return this.http.post<Animal>(this.apiUrl, payload, {
+  createAnimal(payload: CreateAnimalDto,file?:Blob): Observable<Animal> {
+
+    
+      const formData = new FormData();
+      formData.append('nombre', payload.nombre);
+      formData.append('especie', payload.especie);
+      formData.append('idUsuario', payload.idUsuario.toString());
+      if (payload.raza) {
+        formData.append('raza', payload.raza);
+      } 
+      if (payload.Fechanac) {
+        formData.append('Fechanac', payload.Fechanac);
+      } 
+      if (payload.sexo) {
+        formData.append('sexo', payload.sexo);
+      } 
+      if (payload.observaciones) {
+        formData.append('observaciones', payload.observaciones);
+      } 
+    if (file) {
+  formData.append('file', file, 'animal.jpg');
+}
+    
+    return this.http.post<Animal>(this.apiUrl, formData, {
       headers: this.authService.authHeaders(),
     });
   }
 
   /** PUT /api/animal/:id */
-  updateAnimal(idAnimal: number, payload: UpdateAnimalDto): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${idAnimal}`, payload, {
+  updateAnimal(idAnimal: number, payload: UpdateAnimalDto, file?:Blob): Observable<any> {
+
+      const formData = new FormData();
+
+const removeImage = (payload as any).removeImage;
+if (removeImage !== undefined) {
+  formData.append('removeImage', String(removeImage));
+}
+      if (payload.nombre) {
+        formData.append('nombre', payload.nombre);
+      }           
+      if (payload.especie) {  
+        formData.append('especie', payload.especie);
+      }
+      if (payload.idUsuario) {
+        formData.append('idUsuario', payload.idUsuario.toString());
+      } 
+      if (payload.raza) {
+        formData.append('raza', payload.raza);
+      } 
+      if (payload.Fechanac) {
+        formData.append('Fechanac', payload.Fechanac);
+      } 
+      if (payload.sexo) {
+        formData.append('sexo', payload.sexo);
+      } 
+      if (payload.observaciones) {
+        formData.append('observaciones', payload.observaciones);
+      } 
+    if (file) {
+  formData.append('file', file, 'animal.jpg');
+}
+
+
+    return this.http.put(`${this.apiUrl}/${idAnimal}`, formData, {
       headers: this.authService.authHeaders(),
     });
   }

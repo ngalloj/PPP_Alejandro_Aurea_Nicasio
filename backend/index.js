@@ -1,33 +1,65 @@
 //Carga las varibles de entorno de .env y asigna sus valores a process.env
 require('dotenv').config();
 
-
 //Se importa express (de node module), framework para crear servidores web y APIs.
 const express = require("express");
 //Se importa cors (middleware que configura qué orígenes pueden realizar peticiones a mi backend desde el navegador)
 const cors = require("cors");
-
 //Se importa jsonwebtoken (librería para crear y verificar tokens JWT)
 const jwt = require('jsonwebtoken');
-
 // Se importa body-parse (es una colección de middlewares. Su propósito es leer el body de la request y Convierte el body en req.body). No deberia de ser necesario ya que viene incluido en las versiones recientes de express
 const bodyParser = require('body-parser');
 // Se importa path , para trabajar con rutas sin tener en cuenta el sistema operativo
-var path = require('path');
-
+const path = require('path');
 //se instalacia express
 const app = express();
 
-// sirve archivos estáticos (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, 'public')));
+// se importa cloudinary para gestionar las imágenes
+const cloudinary = require('cloudinary').v2;
 
 
-var corsOptions = {
-  origin:"http://localhost:8100"
+/**
+ * CORS
+ * ----
+ * Se definen explícitamente los orígenes permitidos (local y Netlify)
+ * y se aplica el middleware CORS ANTES que el resto de middlewares/rutas.
+ */
+// Orígenes permitidos: 
+const allowedOrigins = [
+  'http://localhost:8100',
+  'http://localhost:4200',
+  'http://localhost:8080',
+  'https://clinica-veterinaria-pages.pages.dev',
+  'https://clinica-veterinaria.netlify.app'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Permitir peticiones sin origen (Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+    // Comprobar si el origen está en la lista blanca
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    // Si no está permitido, devolvemos error
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
 };
-// Se indica que solo se admiten peticiones de este frontend (se deja abierto)
+
+// Aplica CORS globalmente
 app.use(cors(corsOptions));
 
+// Manejar preflight OPTIONS para cualquier ruta sin usar patrones que rompan path-to-regexp
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return cors(corsOptions)(req, res, next);
+  }
+  return next();
+});
+
+// sirve archivos estáticos (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, 'public')));
 
 // permite leer JSON en el body de la petición
 app.use(express.json());
@@ -35,33 +67,31 @@ app.use(express.json());
 // parsea datos enviados por formularios HTML
 app.use(express.urlencoded({ extended: true }));
 
-
 //Se importa el modelo 
 const db = require("./models");
 
 //Se crea un objeto User y se importa Bcrypt para la creación de un usuario basico en el caso de reinicio de la base de datos. 
-const Usuario = db.usuario;
+const Usuario = db.Usuario;
 const bcrypt = require('bcryptjs');
 
 //Se pone el control de si se reinicia con el usuario administrado y que constraseña usa en el .env
-const FORCE_SYNC = process.env.DB_FORCE_SYNC ==='true';
+const FORCE_SYNC = process.env.DB_FORCE_SYNC === 'true';
 const adminPass = process.env.DEFAULT_ADMIN_PASSWORD;
 
-// Se inicializa el modelo (si se decomenta force:true se reinicia el modelo con la correspondiente perdida de información )
-db.sequelize.sync({ force: FORCE_SYNC}).then(async () => {
-  console.log("Drop and re-sync db.");
+// Se inicializa el modelo (en producción NO se recrea el esquema)
+db.sequelize.sync({ alter: false }).then(async () => {
+  console.log("DB sync OK (sin recrear tablas).");
 
-  //Se crea un usuario administrador basico en el caso vaciar la base de datos. 
   if (FORCE_SYNC) {
     const hashedPassword = await bcrypt.hash(adminPass, 10);
 
- await Usuario.findOrCreate({
-      where: { email: "alejandro@ppp.com" }, 
+    await Usuario.findOrCreate({
+      where: { email: "alejandro@ppp.com" },
       defaults: {
         nombre: "Alejandro",
         email: "alejandro@ppp.com",
         contrasena: hashedPassword,
-        rol: "administrativo" 
+        rol: "administrador"
       }
     });
 
@@ -69,8 +99,9 @@ db.sequelize.sync({ force: FORCE_SYNC}).then(async () => {
   }
 });
 
-// Middleware global que inspecciona el header Authorization y gestiona autenticación Basic y JWT
 
+
+// Middleware global que inspecciona el header Authorization y gestiona autenticación Basic y JWT
 app.use((req, res, next) => {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return next(); // si no hay Authorization, seguimos al siguiente middlerware (si queda alguno)
@@ -118,33 +149,32 @@ app.use((req, res, next) => {
   return next();
 });
 
-
 // Se cargan y registran las rutas 
+require("./routes/baseRoutes/usuario.routes")(app);
 
-require("./routes/usuario.routes")(app);
+require("./routes/animalesRoutes/animal.routes")(app);
+require("./routes/catalogoRoutes/elemento.routes")(app);
+require("./routes/catalogoRoutes/producto.routes")(app);
+require("./routes/catalogoRoutes/servicio.routes")(app);
+require("./routes/citasRoutes/cita.routes")(app);
 
-require("./routes/animal.routes")(app);
-require("./routes/cliente.routes")(app);
-require("./routes/producto.routes")(app);
-require("./routes/servicioClinico.routes")(app);
-require("./routes/cita.routes")(app);
-require("./routes/pedido.routes")(app);
-require("./routes/factura.routes")(app);
+require("./routes/historialesRoutes/historial.routes")(app);
+require("./routes/historialesRoutes/lineaHistorial.routes")(app);
 
-require("./routes/lineaPedido.routes")(app);
-require("./routes/lineaFactura.routes")(app);
-
-require("./routes/atienden.routes")(app);
-require("./routes/consultan.routes")(app);
-require("./routes/incluyen.routes")(app);
-require("./routes/necesitan.routes")(app);
-require("./routes/realizan.routes")(app);
-
-
-
+require("./routes/facturacionRoutes/factura.routes")(app);
+require("./routes/facturacionRoutes/lineaFactura.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+
+// Configuración de Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
