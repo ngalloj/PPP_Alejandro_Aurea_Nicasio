@@ -1,5 +1,3 @@
-![image](https://github.com/user-attachments/assets/2f13286b-5869-407e-bf61-1952f9604631)
-
 # 🐾 Veterinary Clinic Management System
 
 **Full Stack Project** by Aurea María Caride González, Alejandro Jesús Suárez Saavedra and Nicasio Manuel Galindo Lojo
