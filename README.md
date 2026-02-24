@@ -1,88 +1,224 @@
-# Full Stack Project by  Aurea María Caride González, Alejandro Jesús Suárez Saavedra and Nicasio Manuel Galindo Lojo
+# 🐾 Veterinary Clinic Management System
+
+**Full Stack Project** by Aurea María Caride González, Alejandro Jesús Suárez Saavedra and Nicasio Manuel Galindo Lojo
 
 ![image](https://github.com/user-attachments/assets/2f13286b-5869-407e-bf61-1952f9604631)
 
-# Clinica Veterinaria 
-# Full stack with  FrontEnd: Ionic/Angular Backend: Node/Express+ Sequelize. 
+## 📌 Project description
 
-As the header says, a project with Ionic, Express, Sequelize and MySQL based on the notes of Miguel Ángel Barrera is just that.
+Full stack web application for veterinary clinic management and client portal.
 
-(https://github.com/ngalloj/PPP_Alejandro_Aurea_Nicasio)
+Includes:
 
-## Getting Started
+* Animal and client management
+* Appointments
+* Medical records
+* Billing
+* Product & service catalog
+* Authentication & roles
 
-These instructions will give you a copy of the project up and running on
-your local machine for development and testing purposes. See deployment
-for notes on deploying the project on a live system.
+Built with:
+**Frontend:** Ionic + Angular
+**Backend:** Node.js + Express + Sequelize
+**Database:** MySQL
 
-Prerequisites, to have installed:
-- SO Windows
-- Node.js 
-- npm
-- XAMPP
-- MySQLWorkbench
-- VSC
+Repository:
+https://github.com/ngalloj/PPP_Alejandro_Aurea_Nicasio
 
-Structure: 
-- /backend - API Node/Express (Sequelize)
-- /frontend - Ionic/Angular
-- database services (currently MySQLWorkbench) and XAMPP
-- scripts in the root package.json to start and install subtasks
+---
 
-Quick installation (local development):
-1. Clone the repo git clone (https://github.com/ngalloj/PPP_Alejandro_Aurea_Nicasio)
-2. Install dependencies for the entire monorepo:
-    npm run install:all 
-    or if you prefer
-    npm install --prefix backend
-    npm install --prefix frontend
-3. Environment variable:
-    .env file in root (exports all the variables)
-4. Starting with Docker (DB + pgAdmin): - docker-compose up -d
-- start pgAdmin
+# 🌐 Production Deployment (Live Services)
 
-5. Start the app in development mode (monorepo): 
-- Start backend and frontend simultaneously: npm run start
-- Start only backend: npm run dev --prefix backend (or) npm run dev:backend
-- Start only frontend: npm run dev --prefix frontend (or) npm run dev:frontend
+## 🗄️ Database (MySQL Cloud)
 
-6. Tests:
-- Backend (jest + supertest): npm test --prefix backend
-- Frontend (karma / ng test): npm test --prefix frontend
+Hosted on **Aiven Cloud**
+Provides managed MySQL database for production.
 
-7. Lint and build:
-- Frontend lint: npm run lint --prefix frontend
-- Build frontend: npm run build --prefix frontend
-- 
+https://console.aiven.io/account/a595efdfaa17/project/aureaalejandronicasio-36ac/services
 
-## Postman access
+---
 
+## ⚙️ Backend API (Node + Express)
 
+Hosted on **Render**
 
-### Contributing
+Handles:
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+* REST API
+* Authentication
+* Database connection
+* Business logic
 
-### Authors
-Aurea María Caride González, Alejandro Jesús Suárez Saavedra and Nicasio Manuel Galindo Lojo - NOVICE Game Developers - 
+https://dashboard.render.com/web/srv-d6cpurctgctc73enplb0
 
-((https://github.com/ngalloj/PPP_Alejandro_Aurea_Nicasio))
+Example API endpoint:
 
-See also the list of
-[contributors](<(https://github.com/ngalloj/PPP_Alejandro_Aurea_Nicasio)/contributors>)
-who participated in this project.
+```
+https://clinicaveterinaria2-0.onrender.com/api
+```
 
-### License
+---
 
-This project is licensed under the [CC0 1.0 Universal](LICENSE.md)
-Creative Commons License - see the [LICENSE.md](LICENSE.md) file for
-details
-A tip for anyone whose code is used
+## 💻 Frontend (Ionic Angular)
 
-Special thanks to the Unity community for their support.
+Hosted on **Cloudflare Pages**
 
-## Acknowledgments
+Responsive web app compatible with:
 
-- Hat tip to anyone whose code is used
-- Inspiration
-- etc
+* Desktop
+* Tablet
+* Mobile
+
+https://dash.cloudflare.com/a24fcc17ff9c1e97a4116b1dfec5e5c4/pages/view/clinica-veterinaria-pages
+
+Live site:
+
+```
+https://clinica-veterinaria-pages.pages.dev
+```
+
+---
+
+## 🖼️ Image Storage (Cloudinary)
+
+Used for:
+
+* Product images
+* Animal photos
+* Media uploads
+
+https://console.cloudinary.com/app/c-0d7e672066d71e7c0be446916218cc/assets/media_library
+
+---
+
+# 🛠️ Local Development Setup
+
+## Prerequisites
+
+* Windows OS
+* Node.js
+* npm
+* MySQL / XAMPP
+* MySQL Workbench
+* Visual Studio Code
+
+---
+
+## Project structure
+
+```
+/backend   → Node/Express API (Sequelize)
+/frontend  → Ionic Angular app
+/database  → MySQL (cloud or local)
+```
+
+---
+
+## Installation
+
+Clone repository:
+
+```
+git clone https://github.com/ngalloj/PPP_Alejandro_Aurea_Nicasio
+```
+
+Install dependencies:
+
+```
+npm run install:all
+```
+
+Or manually:
+
+```
+npm install --prefix backend
+npm install --prefix frontend
+```
+
+---
+
+## Environment variables
+
+Create `.env` in root:
+
+```
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+JWT_SECRET=
+CLOUDINARY_URL=
+```
+
+---
+
+## Run project (development)
+
+Start everything:
+
+```
+npm run start
+```
+
+Only backend:
+
+```
+npm run dev:backend
+```
+
+Only frontend:
+
+```
+npm run dev:frontend
+```
+
+---
+
+## Tests
+
+Backend:
+
+```
+npm test --prefix backend
+```
+
+Frontend:
+
+```
+npm test --prefix frontend
+```
+
+---
+
+## Build frontend
+
+```
+npm run build --prefix frontend
+```
+
+---
+
+# 👨‍💻 Authors
+
+Aurea María Caride González
+
+Alejandro Jesús Suárez Saavedra
+
+Nicasio Manuel Galindo Lojo
+
+Full Stack Developers (DAM)
+
+---
+
+# 📄 License
+
+Creative Commons CC0 1.0 Universal
+
+---
+
+# 🙌 Acknowledgments
+
+* Teachers and DAM program
+* Open source community
+* Ionic & Angular community
+* Node.js ecosystem
