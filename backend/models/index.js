@@ -11,10 +11,14 @@ const sequelize = new Sequelize(
   dbConfig.PASSWORD,
   {
     host: dbConfig.HOST,
-    port: dbConfig.port,          // <-- PUERTO DE AIVEN (10529)
-    dialect: dbConfig.dialect,    // mysql
+    dialect: dbConfig.dialect,
     logging: false,
-    pool: dbConfig.pool           // reutiliza la config del pool
+    pool: {
+      max: dbConfig.pool.max,
+      min: dbConfig.pool.min,
+      acquire: dbConfig.pool.acquire,
+      idle: dbConfig.pool.idle
+    }
   }
 );
 

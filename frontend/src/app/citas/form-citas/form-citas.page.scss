@@ -253,9 +253,11 @@
 }
 
 .field-error {
-  margin: -6px 2px 6px 6px;
+  margin: 6px 16px 12px 16px;  /* sin negativo */
   color: #b91c1c;
   font-size: 13px;
+  line-height: 1.25;
+  white-space: normal;
 }
 
 /* Mensajes */

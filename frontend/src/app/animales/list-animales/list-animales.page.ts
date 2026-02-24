@@ -1,14 +1,10 @@
-// src/app/animales/list-animales/list-animales.page.ts
-
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { Animal, AnimalService } from 'src/app/services/animal.service';
-import { Usuario, UsuarioService } from 'src/app/services/usuario.service';
+import { Animal, AnimalService } from '../../services/animal.service';
+import { Usuario, UsuarioService } from '../../services/usuario.service';
 
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-list-animales',
@@ -21,11 +17,14 @@ export class ListAnimalesPage {
   animales: Animal[] = [];
   animalesFiltrados: Animal[] = [];
 
+  // Mapa idUsuario -> "Nombre Apellidos"
   ownerNameById: Record<number, string> = {};
 
+  // Filtros
   filtroEspecie: string = 'todas';
   filtroTexto: string = '';
 
+  // UI state
   loading = false;
   errorMsg = '';
 
@@ -38,6 +37,7 @@ export class ListAnimalesPage {
   ) {}
 
   get canVer(): boolean {
+    // Cliente: permisos.ts exige ctx.esPropietario=true
     if (this.isCliente) {
       return this.permisos.can('animales', 'ver', { esPropietario: true });
     }
@@ -52,6 +52,7 @@ export class ListAnimalesPage {
     return this.permisos.can('animales', 'eliminar');
   }
 
+  // ✅ helpers rol/usuario
   get isCliente(): boolean {
     return (this.auth.getUserRole() || '') === 'cliente';
   }
@@ -60,12 +61,13 @@ export class ListAnimalesPage {
     return Number(this.auth.getUser()?.idUsuario ?? 0);
   }
 
-  ionViewWillEnter(): void {
+  ionViewWillEnter() {
+    // ✅ guard de acceso
     if (!this.canVer) {
       this.router.navigate(['/menu']);
       return;
     }
-    if (this.isCliente && !this.idUsuarioLogueado) {
+        if (this.isCliente && !this.idUsuarioLogueado) {
       this.router.navigate(['/menu']);
       return;
     }
@@ -73,37 +75,40 @@ export class ListAnimalesPage {
     this.cargarDatos();
   }
 
-  private cargarDatos(): void {
+  private cargarDatos() {
     this.loading = true;
     this.errorMsg = '';
 
+    // Cargamos usuarios y animales
     this.usuarioService.getUsuarios().subscribe({
-      next: (usuarios: Usuario[]) => {
+      next: (usuarios) => {
         this.ownerNameById = this.buildOwnerMap(usuarios || []);
 
         this.animalService.getAnimales().subscribe({
-          next: (animales: Animal[]) => {
+          next: (animales) => {
+            // ✅ filtro por propietario si es cliente
             const all = (animales || []);
             this.animales = this.isCliente
-              ? all.filter((a: Animal) => Number(a.idUsuario) === this.idUsuarioLogueado)
+              ? all.filter(a => Number(a.idUsuario) === this.idUsuarioLogueado)
               : all;
 
             this.aplicarFiltros();
             this.loading = false;
           },
-          error: (err: any) => {
+          error: (err) => {
             this.loading = false;
             this.errorMsg = err?.error?.message || 'Error cargando animales';
           }
         });
       },
-      error: (err: any) => {
+      error: (err) => {
+        // Si falla usuarios, aún puedes listar animales pero sin nombre de propietario
         this.ownerNameById = {};
         this.animalService.getAnimales().subscribe({
-          next: (animales: Animal[]) => {
+          next: (animales) => {
             const all = (animales || []);
             this.animales = this.isCliente
-              ? all.filter((a: Animal) => Number(a.idUsuario) === this.idUsuarioLogueado)
+              ? all.filter(a => Number(a.idUsuario) === this.idUsuarioLogueado)
               : all;
 
             this.aplicarFiltros();
@@ -112,7 +117,7 @@ export class ListAnimalesPage {
               err?.error?.message ||
               'Aviso: no se pudieron cargar los propietarios (se listan animales igualmente).';
           },
-          error: (err2: any) => {
+          error: (err2) => {
             this.loading = false;
             this.errorMsg = err2?.error?.message || 'Error cargando animales';
           }
@@ -134,6 +139,7 @@ export class ListAnimalesPage {
     return this.ownerNameById[idUsuario] || `Usuario ${idUsuario}`;
   }
 
+  // Para llenar el select de especies sin duplicados
   get especiesDisponibles(): string[] {
     const set = new Set<string>();
     for (const a of this.animales) {
@@ -142,10 +148,10 @@ export class ListAnimalesPage {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }
 
-  aplicarFiltros(): void {
+  aplicarFiltros() {
     const txt = this.filtroTexto.toLowerCase().trim();
 
-    this.animalesFiltrados = this.animales.filter((a: Animal) => {
+    this.animalesFiltrados = this.animales.filter(a => {
       const coincideEspecie =
         this.filtroEspecie === 'todas' ? true : (a.especie === this.filtroEspecie);
 
@@ -158,13 +164,14 @@ export class ListAnimalesPage {
     });
   }
 
-  limpiarFiltros(): void {
+  limpiarFiltros() {
     this.filtroEspecie = 'todas';
     this.filtroTexto = '';
     this.aplicarFiltros();
   }
 
-  eliminarAnimal(animal: Animal): void {
+  eliminarAnimal(animal: Animal) {
+    // ✅ seguridad extra (aunque el botón no salga)
     if (!this.canEliminar) return;
 
     if (!confirm(`¿Seguro que quieres eliminar a ${animal.nombre}?`)) return;
@@ -175,32 +182,15 @@ export class ListAnimalesPage {
     });
   }
 
-  verDetalle(animal: Animal): void {
+  verDetalle(animal: Animal) {
     this.router.navigate(['/edit-animales', animal.idAnimal]);
   }
 
-  crearAnimal(): void {
+  crearAnimal() {
     this.router.navigate(['/form-animales']);
   }
 
-  volver(): void {
-    this.router.navigate(['/menu']);
-  }
-
-  // FOTO DEL ANIMAL
-  getAnimalFotoUrl(a: any): string {
-    if (!a || !a.foto) {
-      return 'assets/No-Image-Placeholder.svg';
-    }
-  
-    const foto: string = a.foto;
-  
-    // Si ya es una URL absoluta (Cloudinary, etc.), NO toques nada
-    if (foto.startsWith('http://') || foto.startsWith('https://')) {
-      return foto;
-    }
-  
-    // Caso antiguo: solo nombre de archivo servido por tu backend
-    return `https://ppp-alejandro-aurea-nicasio.onrender.com/images/${foto}`;
+      volver() {
+    this.router.navigate(['/menu']);  
   }
 }

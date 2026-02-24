@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     estado: { type: DataTypes.ENUM('Activo', 'Inactivo'), allowNull: false },
     idAnimal: { type: DataTypes.INTEGER, allowNull: false, unique: true }
   }, {
-    tableName: 'historiales',
+    tableName: 'HISTORIALES',
     timestamps: false
   });
 

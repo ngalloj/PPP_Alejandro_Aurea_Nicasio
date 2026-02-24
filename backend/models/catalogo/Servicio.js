@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     }
   }, {
-    tableName: 'servicios',
+    tableName: 'SERVICIOS',
     timestamps: false
   });
 

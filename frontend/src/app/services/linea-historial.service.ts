@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
-
 
 export type TipoLineaHistorial = 'diagnóstico' | 'tratamiento' | 'observación';
 
@@ -55,7 +53,7 @@ export interface UpdateLineaHistorialDto {
 
 @Injectable({ providedIn: 'root' })
 export class LineaHistorialService {
-  private baseUrl = `${environment.apiUrl}/lineaHistorial`;
+  private baseUrl = 'http://localhost:8080/api/lineaHistorial';
 
   constructor(
     private http: HttpClient,

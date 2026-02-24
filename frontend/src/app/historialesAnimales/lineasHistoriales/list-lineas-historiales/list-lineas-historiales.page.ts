@@ -191,9 +191,11 @@ get canVer(): boolean {
     });
   }
 
-  verDetalle(vm: LineaVM) {
-    this.router.navigate(['/edit-lineas-historiales', vm.idLineaHistorial]);
-  }
+verDetalle(vm: LineaVM) {
+  this.router.navigate(['/edit-lineas-historiales', vm.idLineaHistorial], {
+    queryParams: { idHistorial: this.idHistorial }
+  });
+}
 
   eliminarLinea(vm: LineaVM) {
     if (!confirm(`¿Eliminar esta línea de historial?\n\nAutor: ${vm.autorLabel}`)) return;

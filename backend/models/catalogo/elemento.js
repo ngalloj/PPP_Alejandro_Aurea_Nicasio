@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     descripcion: { type: DataTypes.TEXT, allowNull: true },
     precio: { type: DataTypes.DECIMAL(10,2), allowNull: false }
   }, {
-    tableName: 'elementos',
+    tableName: 'ELEMENTOS',
     timestamps: false
   });
 

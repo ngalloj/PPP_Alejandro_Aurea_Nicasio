@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
 
 /** Coincide con tu ENUM en backend */
 export type ProductoTipo = 'medicamento' | 'material' | 'alimentacion' | 'complementos';
@@ -58,7 +57,7 @@ export interface UpdateProductoDto {
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  private apiUrl = `${environment.apiUrl}/producto`;
+  private apiUrl = 'http://localhost:8080/api/producto';
 
   constructor(
     private http: HttpClient,

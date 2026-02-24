@@ -1,5 +1,3 @@
-// src/app/animales/edit-animales/edit-animales.page.ts
-
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Animal, AnimalService, UpdateAnimalDto } from '../../services/animal.service';
@@ -7,8 +5,9 @@ import { Usuario, UsuarioService } from '../../services/usuario.service';
 
 import { PermisosService } from 'src/app/seguridad/permisos.service';
 import { AuthService } from 'src/app/services/auth.service';
+
 import { PhotoService } from '../../services/photo.service';
-import { environment } from 'src/environments/environment';
+
 
 type Sexo = 'M' | 'H' | '';
 
@@ -43,10 +42,6 @@ export class EditAnimalesPage {
     idUsuario: undefined,
   };
 
-  capturedPhoto: string = '';
-  originalPhoto: string = '';
-  removeImage = false;
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -55,23 +50,31 @@ export class EditAnimalesPage {
     private permisos: PermisosService,
     private auth: AuthService,
     private photoService: PhotoService,
+
   ) {}
+
+  capturedPhoto: string = "";
+  originalPhoto: string = "";
+
+  removeImage = false;
 
   /* ================== PERMISOS ================== */
 
-  get canEditar(): boolean {
-    if (this.isCliente) {
-      return this.permisos.can('animales', 'editar', { esPropietario: this.isPropietarioAnimal });
-    }
-    return this.permisos.can('animales', 'editar');
+get canEditar(): boolean {
+  if (this.isCliente) {
+    // cliente: editar permitido solo si propietario (y luego en guardarCambios limitas a foto)
+    return this.permisos.can('animales', 'editar', { esPropietario: this.isPropietarioAnimal });
   }
+  return this.permisos.can('animales', 'editar');
+}
 
-  get canVer(): boolean {
-    if (this.isCliente) {
-      return this.permisos.can('animales', 'ver', { esPropietario: this.isPropietarioAnimal });
-    }
-    return this.permisos.can('animales', 'ver');
+get canVer(): boolean {
+  if (this.isCliente) {
+    // solo si es propietario (cuando ya cargaste el animal)
+    return this.permisos.can('animales', 'ver', { esPropietario: this.isPropietarioAnimal });
   }
+  return this.permisos.can('animales', 'ver');
+}
 
   get isCliente(): boolean {
     return (this.auth.getUserRole() || '') === 'cliente';
@@ -83,10 +86,10 @@ export class EditAnimalesPage {
 
   ionViewWillEnter() {
 
-    if (!this.isCliente && !this.canVer) {
-      this.router.navigate(['/menu']);
-      return;
-    }
+  if (!this.isCliente && !this.canVer) {
+    this.router.navigate(['/menu']);
+    return;
+  }
 
     const rawId = this.route.snapshot.paramMap.get('id');
     this.idAnimal = rawId ? Number(rawId) : NaN;
@@ -119,7 +122,7 @@ export class EditAnimalesPage {
     this.animalService.getAnimalById(this.idAnimal).subscribe({
       next: (a) => {
 
-        // CLIENTE solo puede ver su propio animal
+        // 🔒 CLIENTE solo puede ver su propio animal
         if (this.isCliente && Number(a.idUsuario) !== this.idUsuarioLogueado) {
           this.router.navigate(['/menu']);
           return;
@@ -138,7 +141,7 @@ export class EditAnimalesPage {
 
   private rellenarFormDesdeAnimal() {
     if (!this.animal) return;
-  
+
     this.form = {
       nombre: this.animal.nombre ?? '',
       especie: this.animal.especie ?? '',
@@ -147,32 +150,17 @@ export class EditAnimalesPage {
       sexo: this.animal.sexo ?? null,
       observaciones: this.animal.observaciones ?? '',
       idUsuario: this.animal.idUsuario ?? undefined,
-      foto: this.animal.foto ?? '',
     };
-  
-    if (this.animal.foto) {
-      const foto = this.animal.foto as string;
-  
-      if (foto.startsWith('http://') || foto.startsWith('https://')) {
-        // URL absoluta: Cloudinary
-        this.originalPhoto = foto;
-        this.capturedPhoto = foto;
-      } else {
-        // Nombre de archivo antiguo servido por tu backend
-        const baseBackend = environment.apiUrl.replace('/api', '');
-        const url = `${baseBackend}/images/${foto}`;
-        this.originalPhoto = url;
-        this.capturedPhoto = url;
-      }
-    } else {
-      this.originalPhoto = '';
-      this.capturedPhoto = '';
-    }
-  
-    this.removeImage = false;
+if (this.animal.foto) {
+  const url = 'http://localhost:8080/images/' + this.animal.foto;
+  this.originalPhoto = url;
+  this.capturedPhoto = url; // 👈 importante: siempre URL para el <ion-img>
+} else {
+  this.originalPhoto = '';
+  this.capturedPhoto = '';
+}
+this.removeImage = false; // resetea estado al cargar
   }
-  
-  
 
   ownerLabelById(idUsuario: number | null | undefined): string {
     if (!idUsuario) return '-';
@@ -199,11 +187,14 @@ export class EditAnimalesPage {
     this.saving = true;
 
     let blob: Blob | null = null;
+
+
     let payload: UpdateAnimalDto;
 
-    // CLIENTE solo modifica foto
+    // 🔒 CLIENTE solo puede modificar FOTO
     if (this.isCliente) {
-      payload = {};
+      payload = {
+      };
       (payload as any).removeImage = this.removeImage;
     } else {
       payload = {
@@ -215,13 +206,12 @@ export class EditAnimalesPage {
       };
       (payload as any).removeImage = this.removeImage;
     }
+if (!this.removeImage && this.capturedPhoto && this.capturedPhoto !== this.originalPhoto) {
+  const response = await fetch(this.capturedPhoto);
+  blob = await response.blob();
+}
 
-    if (!this.removeImage && this.capturedPhoto && this.capturedPhoto !== this.originalPhoto) {
-      const response = await fetch(this.capturedPhoto);
-      blob = await response.blob();
-    }
-
-    this.animalService.updateAnimal(this.idAnimal, payload, blob ?? undefined).subscribe({
+    this.animalService.updateAnimal(this.idAnimal, payload,  blob ?? undefined).subscribe({
       next: () => {
         this.saving = false;
         this.okMsg = 'Animal actualizado correctamente.';
@@ -238,22 +228,22 @@ export class EditAnimalesPage {
   volver() {
     this.router.navigate(['/list-animales']);
   }
+private get isPropietarioAnimal(): boolean {
+  if (!this.isCliente) return false;
+  return !!this.animal && Number(this.animal.idUsuario) === this.idUsuarioLogueado;
+}
 
-  private get isPropietarioAnimal(): boolean {
-    if (!this.isCliente) return false;
-    return !!this.animal && Number(this.animal.idUsuario) === this.idUsuarioLogueado;
-  }
-
-  // ================== FOTO ==================
-
+  //metodos para las gestión de la foto 
   takePhoto() {
+
     this.photoService.takePhoto().then(data => {
-      this.capturedPhoto = data.webPath ? data.webPath : '';
+      this.capturedPhoto = data.webPath ? data.webPath : "";
       this.removeImage = false;
     });
   }
 
   pickImage() {
+
     this.photoService.pickImage().then(data => {
       this.capturedPhoto = data.webPath;
       this.removeImage = false;
@@ -261,7 +251,10 @@ export class EditAnimalesPage {
   }
 
   discardImage() {
-    this.capturedPhoto = '';
+
+    this.capturedPhoto = "";
     this.removeImage = true;
   }
+
+
 }
