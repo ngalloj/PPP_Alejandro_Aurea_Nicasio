@@ -49,7 +49,7 @@ export interface UpdateServicioDto {
 
 @Injectable({ providedIn: 'root' })
 export class ServicioService {
-  private apiUrl = `${environment.apiUrl}/producto`;
+  private apiUrl = `${environment.apiUrl}/servicio`;
   constructor(
     private http: HttpClient,
     private authService: AuthService
