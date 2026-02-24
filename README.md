@@ -201,7 +201,9 @@ npm run build --prefix frontend
 # 👨‍💻 Authors
 
 Aurea María Caride González
+
 Alejandro Jesús Suárez Saavedra
+
 Nicasio Manuel Galindo Lojo
 
 Full Stack Developers (DAM)
