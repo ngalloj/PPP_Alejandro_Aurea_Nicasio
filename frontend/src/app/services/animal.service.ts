@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
-
 
 export type SexoAnimal = 'M' | 'H';
 
@@ -54,7 +52,7 @@ export interface UpdateAnimalDto {
 
 @Injectable({ providedIn: 'root' })
 export class AnimalService {
-  private apiUrl = `${environment.apiUrl}/animal`;
+  private apiUrl = 'http://localhost:8080/api/animal';
 
   constructor(
     private http: HttpClient,

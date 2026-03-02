@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     idUsuario_pagador: { type: DataTypes.INTEGER, allowNull: false },
     idUsuario_emisor: { type: DataTypes.INTEGER, allowNull: false }
   }, {
-    tableName: 'facturas',
+    tableName: 'FACTURAS',
     timestamps: false
   });
 

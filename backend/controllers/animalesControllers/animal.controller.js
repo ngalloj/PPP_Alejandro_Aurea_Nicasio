@@ -1,48 +1,54 @@
-// Controlador para la entidad Animal
-const db = require("../../models");
-// Se importa el modelo Animal
-const Animal = db.Animal;
-// Se importa Cloudinary para gestionar las imágenes
-const cloudinary = require('cloudinary').v2;
+// animales.controller.js  (cambios mínimos: borrar fichero en public/images al eliminar o reemplazar foto)
 
-// =======================
-// CREAR ANIMAL
-// =======================
-// La función create ahora maneja la subida de imagen a Cloudinary y guarda la URL en la base de datos.
+const db = require("../../models");
+const Animal = db.Animal;
+
+const path = require("path");
+const fs = require("fs/promises");
+
+// ===== utilidades mínimas para borrar imagen =====
+function safeImagePath(filename) {
+  if (!filename) return null;
+  const base = path.basename(filename); // evita rutas raras
+  return path.join(process.cwd(), "public", "images", base);
+}
+
+async function deleteImageIfExists(filename) {
+  if (!filename) return;
+  const filePath = safeImagePath(filename);
+  try {
+    await fs.unlink(filePath);
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      console.warn("No se pudo borrar imagen:", filePath, err.message);
+    }
+  }
+}
+
 exports.create = async (req, res) => {
   try {
     if (!req.body.nombre || !req.body.idUsuario) {
       return res.status(400).send({ message: "nombre e idUsuario son obligatorios." });
     }
 
-    // Inicialmente, la URL de la foto es null (sin imagen)
-    let fotoUrl = null;
-
-    // Si viene fichero, súbelo a Cloudinary
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'clinica/animales',
-      });
-      fotoUrl = result.secure_url;
+      req.body.foto = req.file.filename;
+    } else {
+      req.body.foto = "";
     }
-// Luego creamos el Animal con los datos del body y la URL de la foto (si existe)
-    const data = await Animal.create({
-      ...req.body,
-      foto: fotoUrl, // puede ser null si no hay imagen
-    });
-// Finalmente, devolvemos el nuevo Animal creado.
+
+    const data = await Animal.create(req.body);
     return res.send(data);
   } catch (err) {
+    // limpiar imagen subida si falla create
+    if (req.file?.filename) {
+      await deleteImageIfExists(req.file.filename);
+    }
     return res.status(500).send({ message: err.message || "Error creando Animal." });
   }
 };
 
-// =======================
-// LISTAR / OBTENER
-// =======================
-// La función findAll devuelve todos los animales, y findOne devuelve un animal por su id.
 exports.findAll = async (req, res) => {
-  // La función findAll obtiene todos los registros de la tabla Animal y los devuelve. Si ocurre un error, devuelve un error 500.
   try {
     const data = await Animal.findAll();
     return res.send(data);
@@ -50,9 +56,8 @@ exports.findAll = async (req, res) => {
     return res.status(500).send({ message: err.message || "Error listando Animales." });
   }
 };
-// Al buscar un Animal por id, devolvemos el animal encontrado o un error 404 si no existe.
+
 exports.findOne = async (req, res) => {
-  // La función findOne busca un Animal por su id (idAnimal) y devuelve el resultado. Si no se encuentra, devuelve un error 404.
   try {
     const id = req.params.id;
     const data = await Animal.findByPk(id);
@@ -63,61 +68,75 @@ exports.findOne = async (req, res) => {
   }
 };
 
-// =======================
-// ACTUALIZAR ANIMAL
-// =======================
-// La función update ahora maneja la lógica de actualización de la imagen: si se indica que se quiere eliminar la imagen, se borra; si se sube una nueva imagen, se actualiza la URL; si no se toca el campo de imagen, no se modifica.
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
-// Para interpretar correctamente la intención de eliminar la imagen, comprobamos si el campo removeImage en el body es true (en varias formas). Esto permite que el cliente indique que quiere eliminar la imagen sin necesidad de subir una nueva.
+
+    // 1) Leer foto anterior para poder borrarla si procede
+    const actual = await Animal.findByPk(id);
+    if (!actual) return res.status(404).send({ message: `Animal no encontrado id=${id}` });
+    const oldFoto = actual.foto;
+
     const removeImage =
       req.body.removeImage === true ||
-      req.body.removeImage === 'true' ||
-      req.body.removeImage === '1' ||
+      req.body.removeImage === "true" ||
+      req.body.removeImage === "1" ||
       req.body.removeImage === 1;
-// La variable removeImage se interpreta como true si el valor es booleano true, o la cadena 'true', o '1', o el número 1. Esto permite flexibilidad en cómo se indica que se quiere eliminar la imagen.
-    let nuevaFoto; // undefined = no tocar, null = borrar, string = nueva URL
-// Si removeImage es true, establecemos nuevaFoto a null para indicar que se debe eliminar la imagen. Si se sube un nuevo archivo, lo subimos a Cloudinary y guardamos la nueva URL. Si ninguna de las dos cosas ocurre, dejamos nuevaFoto como undefined para no modificar el campo de la foto.
+
+    // 2) Setear nueva foto / borrar referencia
+    if (req.file) {
+      req.body.foto = req.file.filename;
+    }
     if (removeImage) {
-      nuevaFoto = null;
-    } else if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'clinica/animales',
-      });
-      nuevaFoto = result.secure_url;
-    }
-// Luego, preparamos los datos a actualizar. Copiamos todo lo que viene en req.body, pero eliminamos el campo 'foto' para evitar sobreescribirlo accidentalmente. Si nuevaFoto no es undefined, lo añadimos al objeto de actualización.
-    const updateData = { ...req.body };
-
-    // No queremos sobreescribir con el nombre de fichero local
-    delete updateData.foto;
-// Si nuevaFoto es null, se eliminará la imagen; si es una URL, se actualizará; si es undefined, no se tocará el campo de la foto.
-    if (nuevaFoto !== undefined) {
-      updateData.foto = nuevaFoto;
+      req.body.foto = null;
     }
 
-    const [num] = await Animal.update(updateData, { where: { idAnimal: id } });
-// El método update devuelve un array donde el primer elemento es el número de filas afectadas. Si num es 1, significa que se actualizó un registro correctamente. Si num es 0, significa que no se encontró el Animal con ese id o no se modificó ningún campo (por ejemplo, si los datos enviados son iguales a los existentes).
-    if (num === 1) {
-      return res.send({ message: "Animal actualizado correctamente." });
+    const [num] = await Animal.update(req.body, { where: { idAnimal: id } });
+
+    if (num !== 1) {
+      // si no se actualizó, elimina posible fichero nuevo para no dejarlo huérfano
+      if (req.file?.filename) await deleteImageIfExists(req.file.filename);
+      return res.send({ message: `No ha sido posible actualizar Animal id=${id}.` });
     }
-    return res.send({ message: `No ha sido posible actualizar Animal id=${id}.` });
+
+    // 3) Borrar fichero viejo si:
+    // - se pidió removeImage
+    // - o se subió una nueva imagen
+    if ((removeImage || req.file) && oldFoto) {
+      // evita borrar si por error coincide con la nueva
+      if (!req.file || oldFoto !== req.file.filename) {
+        await deleteImageIfExists(oldFoto);
+      }
+    }
+
+    return res.send({ message: "Animal actualizado correctamente." });
   } catch (err) {
+    // si falló el update y subieron fichero, lo limpiamos
+    if (req.file?.filename) {
+      await deleteImageIfExists(req.file.filename);
+    }
     return res.status(500).send({ message: "Error actualizando Animal id=" + req.params.id });
   }
 };
 
-// =======================
-// BORRAR ANIMAL
-// =======================
-// La función delete elimina un animal por su id y devuelve un mensaje indicando si la eliminación fue exitosa o no.
 exports.delete = async (req, res) => {
-  // La función delete elimina un Animal por su id (idAnimal) y devuelve un mensaje indicando si la eliminación fue exitosa o no. Si ocurre un error, devuelve un error 500.
   try {
     const id = req.params.id;
+
+    // 1) leer foto antes de borrar
+    const actual = await Animal.findByPk(id);
+    if (!actual) return res.status(404).send({ message: `Animal no encontrado id=${id}` });
+    const oldFoto = actual.foto;
+
+    // 2) borrar registro
     const num = await Animal.destroy({ where: { idAnimal: id } });
-    if (num === 1) return res.send({ message: "Animal eliminado correctamente." });
+
+    // 3) borrar fichero si se borró el registro
+    if (num === 1) {
+      if (oldFoto) await deleteImageIfExists(oldFoto);
+      return res.send({ message: "Animal eliminado correctamente." });
+    }
+
     return res.send({ message: `No ha sido posible eliminar Animal id=${id}.` });
   } catch (err) {
     return res.status(500).send({ message: "Error eliminando Animal id=" + req.params.id });

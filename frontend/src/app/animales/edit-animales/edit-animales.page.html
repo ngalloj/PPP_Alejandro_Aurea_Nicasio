@@ -52,8 +52,8 @@
             <h3>{{ editMode ? 'Edición' : 'Vista' }}</h3>
             <p class="ion-text-wrap">
               {{ editMode
-              ? 'Actualiza la información del animal y guarda los cambios.'
-              : 'Revisa los datos del animal y edita si tienes permisos.' }}
+                ? 'Actualiza la información del animal y guarda los cambios.'
+                : 'Revisa los datos del animal y edita si tienes permisos.' }}
             </p>
 
             <div class="chip" *ngIf="!editMode">
@@ -100,13 +100,17 @@
           <!-- Foto (vista) -->
           <div class="photo-wrap">
             <div class="photo-box view">
-              <ion-img *ngIf="originalPhoto" class="photo-frame" [src]="originalPhoto">
+              <ion-img
+                *ngIf="originalPhoto"
+                class="photo-frame"
+                [src]="originalPhoto">
               </ion-img>
 
-              <ion-img *ngIf="!originalPhoto" class="photo-frame placeholder"
-                src="../../../../assets/No-Image-Placeholder.svg">
+              <ion-img
+                *ngIf="!originalPhoto"
+                class="photo-frame placeholder"
+                src="../../assets/No-Image-Placeholder.svg">
               </ion-img>
-
             </div>
           </div>
 
@@ -193,10 +197,15 @@
               <ion-row class="ion-align-items-center">
                 <ion-col size="12" size-md="6">
                   <div class="photo-box" (click)="takePhoto()">
-                    <ion-img *ngIf="capturedPhoto" class="photo-frame" [src]="capturedPhoto">
+                    <ion-img
+                      *ngIf="capturedPhoto"
+                      class="photo-frame"
+                      [src]="capturedPhoto">
                     </ion-img>
 
-                    <ion-img *ngIf="!capturedPhoto" class="photo-frame placeholder"
+                    <ion-img
+                      *ngIf="!capturedPhoto"
+                      class="photo-frame placeholder"
                       src="../../assets/No-Image-Placeholder.svg">
                     </ion-img>
 
@@ -250,7 +259,11 @@
               <!-- Nombre -->
               <ion-item class="field" lines="inset">
                 <ion-label position="floating">Nombre *</ion-label>
-                <ion-input name="nombre" [(ngModel)]="form.nombre" required [disabled]="isCliente">
+                <ion-input
+                  name="nombre"
+                  [(ngModel)]="form.nombre"
+                  required
+                  [disabled]="isCliente">
                 </ion-input>
               </ion-item>
 
@@ -258,14 +271,21 @@
                 <!-- Especie -->
                 <ion-item class="field" lines="inset">
                   <ion-label position="floating">Especie *</ion-label>
-                  <ion-input name="especie" [(ngModel)]="form.especie" required [disabled]="isCliente">
+                  <ion-input
+                    name="especie"
+                    [(ngModel)]="form.especie"
+                    required
+                    [disabled]="isCliente">
                   </ion-input>
                 </ion-item>
 
                 <!-- Raza -->
                 <ion-item class="field" lines="inset">
                   <ion-label position="floating">Raza</ion-label>
-                  <ion-input name="raza" [(ngModel)]="form.raza" [disabled]="isCliente">
+                  <ion-input
+                    name="raza"
+                    [(ngModel)]="form.raza"
+                    [disabled]="isCliente">
                   </ion-input>
                 </ion-item>
               </div>
@@ -281,7 +301,11 @@
                 <!-- Fecha nacimiento -->
                 <ion-item class="field" lines="inset">
                   <ion-label position="floating">Fecha de nacimiento</ion-label>
-                  <ion-input type="date" name="Fechanac" [(ngModel)]="form.Fechanac" [disabled]="isCliente">
+                  <ion-input
+                    type="date"
+                    name="Fechanac"
+                    [(ngModel)]="form.Fechanac"
+                    [disabled]="isCliente">
                   </ion-input>
                 </ion-item>
 
@@ -299,7 +323,10 @@
               <!-- Observaciones -->
               <ion-item class="field" lines="inset">
                 <ion-label position="floating">Observaciones</ion-label>
-                <ion-textarea name="observaciones" [(ngModel)]="form.observaciones" [disabled]="isCliente">
+                <ion-textarea
+                  name="observaciones"
+                  [(ngModel)]="form.observaciones"
+                  [disabled]="isCliente">
                 </ion-textarea>
               </ion-item>
 
@@ -315,12 +342,21 @@
             </div>
 
             <div class="actions">
-              <ion-button class="submit-btn" expand="block" type="submit" [disabled]="f.invalid || saving">
+              <ion-button
+                class="submit-btn"
+                expand="block"
+                type="submit"
+                [disabled]="f.invalid || saving">
                 <ion-icon name="save-outline" slot="start"></ion-icon>
                 {{ saving ? 'Guardando...' : 'Guardar cambios' }}
               </ion-button>
 
-              <ion-button class="cancel-btn" expand="block" fill="outline" type="button" (click)="cancelarEdicion()">
+              <ion-button
+                class="cancel-btn"
+                expand="block"
+                fill="outline"
+                type="button"
+                (click)="cancelarEdicion()">
                 <ion-icon name="close-outline" slot="start"></ion-icon>
                 Cancelar
               </ion-button>
